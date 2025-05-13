@@ -1,0 +1,4 @@
+enum AccessMode {
+  readOnly,
+  readWrite,
+}
