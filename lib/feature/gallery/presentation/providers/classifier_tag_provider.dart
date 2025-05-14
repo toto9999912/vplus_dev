@@ -130,9 +130,6 @@ class ClassifierTagNotifier extends _$ClassifierTagNotifier {
         await repository.reorderTag(request);
         // 成功排序後更新
       } catch (e) {
-        // 錯誤處理 - 還原狀態並顯示錯誤
-        print('重新排序標籤失敗: $e');
-
         // 還原到原始狀態
         state = AsyncValue.data(originalClassifier);
 

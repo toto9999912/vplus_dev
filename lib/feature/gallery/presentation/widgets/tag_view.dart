@@ -29,7 +29,7 @@ class TagView extends ConsumerWidget {
       onReorder: (int oldIndex, int newIndex) {
         ref.read(classifierTagNotifierProvider(classifierId).notifier).reorderTags(subClassifierIndex, categoryIndex, oldIndex, newIndex);
       },
-      footer: [AppButton.outline(child: Icon(Icons.add))],
+      footer: [AppButton.outline(child: Icon(Icons.add), onPressed: () {})],
       children:
           category.tags.map((tag) {
             final isSelected = selectedTags.any((t) => t.id == tag.id);
