@@ -109,4 +109,37 @@ class ApiClient {
     );
     return ApiResponse.fromJson(response.data, fromJsonT);
   }
+
+  /// 用於表單資料上傳（包括檔案上傳）的方法
+  /// [path] API路徑
+  /// [data] FormData 格式的資料
+  /// [queryParameters] URL查詢參數
+  /// [headers] 自定義標頭
+  /// [onSendProgress] 發送進度回調
+  /// [onReceiveProgress] 接收進度回調
+  /// [withToken] 是否需要授權令牌
+  Future<Response> postForm(
+    String path, {
+    required FormData data,
+    Map<String, dynamic>? queryParameters,
+    Map<String, String>? headers,
+    ProgressCallback? onSendProgress,
+    ProgressCallback? onReceiveProgress,
+    bool withToken = true,
+  }) async {
+    try {
+      final response = await _client.post(
+        path,
+        data: data,
+        queryParameters: queryParameters,
+        options: Options(headers: createHeaders(headers: headers, withToken: withToken)),
+        onSendProgress: onSendProgress,
+        onReceiveProgress: onReceiveProgress,
+      );
+      return response;
+    } catch (e) {
+      debugPrint('postForm error: $e');
+      rethrow;
+    }
+  }
 }
