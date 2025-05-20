@@ -148,8 +148,6 @@ class ClassifierTagNotifier extends _$ClassifierTagNotifier {
     ref.read(snackbarMessageNotifierProvider.notifier).showError(message);
   }
 
-  // ...existing code...
-
   // 新增標籤
   void createTag(int subClassifierIndex, int categoryIndex, String title, int color) async {
     final currentState = state;
@@ -251,9 +249,6 @@ class ClassifierTagNotifier extends _$ClassifierTagNotifier {
         // 5. 如果有選中的標籤也需要更新
         _updateSelectedTags(tagId, updatedTag);
 
-        // 通知成功（提前通知用戶，增強用戶體驗）
-        ref.read(snackbarMessageNotifierProvider.notifier).showSuccess('標籤已更新');
-
         // 創建請求DTO
         final request = TagRequestDto(categoryId: category.id, title: title, color: color);
 
@@ -297,7 +292,71 @@ class ClassifierTagNotifier extends _$ClassifierTagNotifier {
     }
   }
 
-  void deleteTag() {}
+  // 刪除標籤（樂觀更新模式）
+  void deleteTag(int subClassifierIndex, int categoryIndex, int tagId) async {
+    final currentState = state;
+    if (currentState is AsyncData<Classifier>) {
+      final originalClassifier = currentState.value;
+
+      // 檢查索引有效性
+      if (originalClassifier.subClassifiers == null ||
+          subClassifierIndex >= originalClassifier.subClassifiers!.length ||
+          originalClassifier.subClassifiers![subClassifierIndex].categories == null ||
+          categoryIndex >= originalClassifier.subClassifiers![subClassifierIndex].categories!.length) {
+        showErrorMessage('無法刪除標籤: 索引無效');
+        return;
+      }
+
+      final category = originalClassifier.subClassifiers![subClassifierIndex].categories![categoryIndex];
+      final tagIndex = category.tags.indexWhere((tag) => tag.id == tagId);
+
+      if (tagIndex == -1) {
+        showErrorMessage('無法刪除標籤: 找不到標籤');
+        return;
+      }
+
+      // 獲取原始標籤對象（用於可能的回滾）
+
+      try {
+        // 樂觀更新 UI
+        // 1. 更新標籤列表（移除目標標籤）
+        final updatedTags = List.of(category.tags);
+        updatedTags.removeAt(tagIndex);
+
+        // 2. 更新分類
+        final updatedCategory = category.copyWith(tags: updatedTags);
+        final updatedCategories = List.of(originalClassifier.subClassifiers![subClassifierIndex].categories!);
+        updatedCategories[categoryIndex] = updatedCategory;
+
+        // 3. 更新子分類器
+        final updatedSubClassifier = originalClassifier.subClassifiers![subClassifierIndex].copyWith(categories: updatedCategories);
+        final updatedSubClassifiers = List.of(originalClassifier.subClassifiers!);
+        updatedSubClassifiers[subClassifierIndex] = updatedSubClassifier;
+
+        // 4. 更新整個分類器
+        final updatedClassifier = originalClassifier.copyWith(subClassifiers: updatedSubClassifiers);
+        state = AsyncData(updatedClassifier);
+
+        // 5. 如果有選中的標籤也需要移除
+        final selectedTagsNotifier = ref.read(selectedTagsProvider.notifier);
+        if (selectedTagsNotifier.isSelected(tagId)) {
+          selectedTagsNotifier.removeTag(tagId);
+        }
+
+        // 發送請求到後端
+        final repository = ref.read(galleryRepositoryProvider);
+        await repository.deleteTag(tagId);
+
+        // 成功刪除，無需額外處理（已經更新了UI）
+      } catch (e) {
+        // 發生錯誤時通知用戶並回滾
+        showErrorMessage('刪除標籤失敗: ${e.toString()}');
+
+        // 回滾狀態到原始狀態
+        state = AsyncData(originalClassifier);
+      }
+    }
+  }
 
   void addTagCategory() {}
 

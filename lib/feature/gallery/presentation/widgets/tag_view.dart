@@ -9,6 +9,7 @@ import '../../domain/entities/tag.dart';
 import '../../domain/entities/tag_category.dart';
 import '../providers/classifier_tag_provider.dart';
 import '../providers/selected_tag_provider.dart';
+import 'tag_form_widget.dart';
 
 final defaultColors = [
   AppColors.white,
@@ -29,7 +30,6 @@ class TagView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final selectedTagsNotifier = ref.watch(selectedTagsProvider.notifier);
     final selectedTags = ref.watch(selectedTagsProvider);
     return ReorderableGridView.count(
       padding: const EdgeInsets.all(8),
@@ -42,256 +42,106 @@ class TagView extends ConsumerWidget {
       onReorder: (int oldIndex, int newIndex) {
         ref.read(classifierTagNotifierProvider(classifierId).notifier).reorderTags(subClassifierIndex, categoryIndex, oldIndex, newIndex);
       },
-      footer: [
-        AppButton.outline(
-          child: Icon(Icons.add),
-          onPressed: () async {
-            final result = await AppFormDialog.show<Tag>(
-              context: context,
-              title: '新增Tag',
-              initialData: Tag.empty(),
-              bodyBuilder: (context, initialData, onDataChanged) {
-                // 創建表單元素
-                return Column(
-                  children: [
-                    Container(
-                      margin: const EdgeInsets.only(top: 15, bottom: 15),
-                      decoration: BoxDecoration(color: const Color.fromRGBO(0, 0, 0, 0.1), borderRadius: BorderRadius.circular(4)),
-                      child: TextFormField(
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(fontSize: 18),
-                        minLines: 1,
-                        maxLines: 2,
-                        decoration: const InputDecoration(
-                          isDense: true,
-                          contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 10.0, 15.0),
-                          border: InputBorder.none,
-                        ),
-                        initialValue: initialData?.title,
-                        onChanged: (value) {
-                          // 即時更新數據
-                          final newData = initialData?.copyWith(title: value);
-                          onDataChanged(newData);
-                        },
-                      ),
-                    ),
-
-                    ColorPicker(
-                      initialColor: AppColors.white,
-                      onColorChanged: (color) {
-                        final newData = initialData?.copyWith(color: defaultColors.indexOf(color));
-                        onDataChanged(newData);
-                      },
-                    ),
-                  ],
-                );
-              },
-            );
-            if (result == null) return;
-
-            ref.read(classifierTagNotifierProvider(classifierId).notifier).createTag(subClassifierIndex, categoryIndex, result.title, result.color);
-          },
-        ),
-      ],
+      footer: [AppButton.outline(child: const Icon(Icons.add), onPressed: () => _handleAddTag(context, ref))],
       children:
           category.tags.map((tag) {
             final isSelected = selectedTags.any((t) => t.id == tag.id);
-            return isSelected
-                ? AppButton(
-                  key: ValueKey(tag.id),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min, // 設置為緊湊模式
-                    children: [
-                      Container(width: 8, height: 8, decoration: BoxDecoration(color: defaultColors[tag.color], shape: BoxShape.circle)),
-                      SizedBox(width: 4),
-                      Flexible(
-                        child: Text(
-                          tag.title,
-                          style: TextStyle(fontSize: 12),
-                          overflow: TextOverflow.ellipsis, // 文字過長時顯示省略號
-                          maxLines: 2, // 限制一行
-                        ),
-                      ),
-                    ],
-                  ),
-                  onPressed: () {
-                    selectedTagsNotifier.toggleTag(tag);
-                  },
-                  onDoubleTap: () async {
-                    // 編輯現有標籤
-                    final result = await AppFormDialog.show<Tag>(
-                      context: context,
-                      title: '編輯標籤',
-                      initialData: tag, // 使用現有標籤作為初始數據
-                      bodyBuilder: (context, initialData, onDataChanged) {
-                        return Column(
-                          children: [
-                            Container(
-                              margin: const EdgeInsets.only(top: 15, bottom: 15),
-                              decoration: BoxDecoration(color: const Color.fromRGBO(0, 0, 0, 0.1), borderRadius: BorderRadius.circular(4)),
-                              child: TextFormField(
-                                textAlign: TextAlign.center,
-                                style: const TextStyle(fontSize: 18),
-                                minLines: 1,
-                                maxLines: 2,
-                                decoration: const InputDecoration(
-                                  isDense: true,
-                                  contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 10.0, 15.0),
-                                  border: InputBorder.none,
-                                ),
-                                initialValue: initialData?.title,
-                                onChanged: (value) {
-                                  final newData = initialData?.copyWith(title: value);
-                                  onDataChanged(newData);
-                                },
-                              ),
-                            ),
-
-                            ColorPicker(
-                              initialColor: defaultColors[initialData?.color ?? 0],
-                              onColorChanged: (color) {
-                                final newData = initialData?.copyWith(color: defaultColors.indexOf(color));
-                                onDataChanged(newData);
-                              },
-                            ),
-                          ],
-                        );
-                      },
-                    );
-                    if (result == null) return;
-
-                    // 呼叫編輯標籤方法
-                    ref
-                        .read(classifierTagNotifierProvider(classifierId).notifier)
-                        .editTag(subClassifierIndex, categoryIndex, tag.id, result.title, result.color);
-                  },
-                )
-                : AppButton.outline(
-                  key: ValueKey(tag.id),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min, // 設置為緊湊模式
-                    children: [
-                      Container(width: 8, height: 8, decoration: BoxDecoration(color: defaultColors[tag.color], shape: BoxShape.circle)),
-                      SizedBox(width: 4),
-                      Flexible(
-                        child: Text(
-                          tag.title,
-                          style: TextStyle(fontSize: 12),
-                          overflow: TextOverflow.ellipsis, // 文字過長時顯示省略號
-                          maxLines: 2, // 限制一行
-                        ),
-                      ),
-                    ],
-                  ),
-                  onPressed: () {
-                    selectedTagsNotifier.toggleTag(tag);
-                  },
-                  onDoubleTap: () async {
-                    // 編輯現有標籤
-                    final result = await AppFormDialog.show<Tag>(
-                      context: context,
-                      title: '編輯標籤',
-                      initialData: tag, // 使用現有標籤作為初始數據
-                      bodyBuilder: (context, initialData, onDataChanged) {
-                        return Column(
-                          children: [
-                            Container(
-                              margin: const EdgeInsets.only(top: 15, bottom: 15),
-                              decoration: BoxDecoration(color: const Color.fromRGBO(0, 0, 0, 0.1), borderRadius: BorderRadius.circular(4)),
-                              child: TextFormField(
-                                textAlign: TextAlign.center,
-                                style: const TextStyle(fontSize: 18),
-                                minLines: 1,
-                                maxLines: 2,
-                                decoration: const InputDecoration(
-                                  isDense: true,
-                                  contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 10.0, 15.0),
-                                  border: InputBorder.none,
-                                ),
-                                initialValue: initialData?.title,
-                                onChanged: (value) {
-                                  final newData = initialData?.copyWith(title: value);
-                                  onDataChanged(newData);
-                                },
-                              ),
-                            ),
-
-                            ColorPicker(
-                              initialColor: defaultColors[initialData?.color ?? 0],
-                              onColorChanged: (color) {
-                                final newData = initialData?.copyWith(color: defaultColors.indexOf(color));
-                                onDataChanged(newData);
-                              },
-                            ),
-                          ],
-                        );
-                      },
-                    );
-                    if (result == null) return;
-
-                    // 呼叫編輯標籤方法
-                    ref
-                        .read(classifierTagNotifierProvider(classifierId).notifier)
-                        .editTag(subClassifierIndex, categoryIndex, tag.id, result.title, result.color);
-                  },
-                );
+            return _buildTagButton(context, ref, tag, isSelected);
           }).toList(),
     );
   }
-}
 
-class ColorPicker extends StatefulWidget {
-  final Color initialColor;
-  final Function(Color) onColorChanged;
+  // 構建標籤按鈕
+  Widget _buildTagButton(BuildContext context, WidgetRef ref, Tag tag, bool isSelected) {
+    // 構建子部件
+    final buttonChild = _buildTagButtonContent(tag);
 
-  const ColorPicker({required this.initialColor, required this.onColorChanged, super.key});
-
-  @override
-  State<ColorPicker> createState() => _ColorPickerState();
-}
-
-class _ColorPickerState extends State<ColorPicker> {
-  late Color _selectedColor;
-
-  @override
-  void initState() {
-    super.initState();
-    _selectedColor = widget.initialColor;
+    // 根據選中狀態決定按鈕類型
+    return isSelected
+        ? AppButton(
+          key: ValueKey(tag.id),
+          child: buttonChild,
+          onPressed: () {
+            ref.read(selectedTagsProvider.notifier).toggleTag(tag);
+          },
+          onDoubleTap: () => _handleEditTag(context, ref, tag),
+        )
+        : AppButton.outline(
+          key: ValueKey(tag.id),
+          child: buttonChild,
+          onPressed: () {
+            ref.read(selectedTagsProvider.notifier).toggleTag(tag);
+          },
+          onDoubleTap: () => _handleEditTag(context, ref, tag),
+        );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+  // 構建標籤按鈕內容
+  Widget _buildTagButtonContent(Tag tag) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
       children: [
-        Wrap(
-          children:
-              defaultColors
-                  .map(
-                    (color) => GestureDetector(
-                      onTap: () {
-                        setState(() => _selectedColor = color);
-                        widget.onColorChanged(color);
-                      },
-                      child: Container(
-                        margin: EdgeInsets.all(5),
-                        padding: EdgeInsets.all(3),
-                        decoration: BoxDecoration(
-                          color: color,
-                          shape: BoxShape.circle,
-                          border: Border.all(color: _selectedColor == color ? AppColors.textGrey : Colors.transparent),
-                          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 2, offset: const Offset(0, 1))],
-                        ),
-                        child:
-                            _selectedColor == color
-                                ? Icon(Icons.check, size: 20, color: _selectedColor == AppColors.white ? Colors.black : Colors.white)
-                                : SizedBox(height: 20, width: 20),
-                      ),
-                    ),
-                  )
-                  .toList(),
-        ),
+        Container(width: 8, height: 8, decoration: BoxDecoration(color: defaultColors[tag.color], shape: BoxShape.circle)),
+        const SizedBox(width: 4),
+        Flexible(child: Text(tag.title, style: const TextStyle(fontSize: 12), overflow: TextOverflow.ellipsis, maxLines: 2)),
       ],
     );
+  }
+
+  // 處理新增標籤
+  Future<void> _handleAddTag(BuildContext context, WidgetRef ref) async {
+    Tag formData = Tag.empty();
+
+    final result = await AppFormDialog.show<Tag>(
+      context: context,
+      title: '新增Tag',
+      initialData: formData,
+      bodyBuilder: (context, initialData, onDataChanged) {
+        return TagFormWidget(
+          initialData: initialData ?? Tag.empty(),
+          initialColor: defaultColors[0],
+          onDataChanged: (updatedTag) {
+            formData = updatedTag; // 保存最新狀態
+            onDataChanged(updatedTag);
+          },
+        );
+      },
+    );
+
+    if (result == null) return;
+
+    ref.read(classifierTagNotifierProvider(classifierId).notifier).createTag(subClassifierIndex, categoryIndex, formData.title, formData.color);
+  }
+
+  // 處理編輯標籤
+  Future<void> _handleEditTag(BuildContext context, WidgetRef ref, Tag tag) async {
+    Tag formData = tag;
+
+    final result = await AppFormDialog.show<Tag>(
+      context: context,
+      title: '編輯標籤',
+      initialData: tag,
+      customAction: IconButton(
+        onPressed: () {
+          ref.read(classifierTagNotifierProvider(classifierId).notifier).deleteTag(subClassifierIndex, categoryIndex, tag.id);
+          Navigator.of(context, rootNavigator: true).pop();
+        },
+        icon: const Icon(Icons.delete),
+      ),
+      bodyBuilder: (context, initialData, onDataChanged) {
+        return TagFormWidget(
+          initialData: initialData ?? tag,
+          initialColor: defaultColors[tag.color],
+          onDataChanged: (updatedTag) {
+            formData = updatedTag; // 保存最新狀態
+            onDataChanged(updatedTag);
+          },
+        );
+      },
+    );
+
+    if (result == null) return;
+
+    ref.read(classifierTagNotifierProvider(classifierId).notifier).editTag(subClassifierIndex, categoryIndex, tag.id, formData.title, formData.color);
   }
 }

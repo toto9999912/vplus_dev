@@ -55,11 +55,11 @@ class RemoteGalleryDataSourceImpl implements GalleryDataSource {
 
   @override
   Future<void> editTag(int tagId, TagRequestDto request) async {
-    await client.put(
-      'gallery/tag/$tagId',
-      withToken: true,
-      body: request.toJson(),
-      fromJsonT: (json) => TagResponseDto.fromJson(json as Map<String, dynamic>),
-    );
+    await client.put('gallery/tag/$tagId', withToken: true, body: request.toJson(), fromJsonT: (json) => null);
+  }
+
+  @override
+  Future<void> deleteTag(int tagId) async {
+    await client.delete('gallery/tag/$tagId', withToken: true, fromJsonT: (json) => null);
   }
 }

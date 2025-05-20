@@ -17,4 +17,6 @@ abstract class GalleryRepository {
   Future<Tag> createTag(TagRequestDto request);
 
   Future<void> editTag(int tagId, TagRequestDto request);
+
+  Future<void> deleteTag(int tagId);
 }

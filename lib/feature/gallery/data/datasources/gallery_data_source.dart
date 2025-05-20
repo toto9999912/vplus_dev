@@ -16,4 +16,6 @@ abstract class GalleryDataSource {
   Future<TagResponseDto> createTag(TagRequestDto request);
 
   Future<void> editTag(int tagId, TagRequestDto request);
+
+  Future<void> deleteTag(int tagId);
 }

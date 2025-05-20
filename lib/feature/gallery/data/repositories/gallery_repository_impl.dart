@@ -46,4 +46,9 @@ class GalleryRepositoryImpl implements GalleryRepository {
   Future<void> editTag(int tagId, TagRequestDto request) async {
     await _dataSource.editTag(tagId, request);
   }
+
+  @override
+  Future<void> deleteTag(int tagId) async {
+    await _dataSource.deleteTag(tagId);
+  }
 }
