@@ -20,9 +20,10 @@ class TagCategroyView extends ConsumerWidget {
         return Container(
           key: ValueKey(category.id),
           decoration: BoxDecoration(
-            border: categoryIndex == 0
-                ? Border.symmetric(horizontal: BorderSide(color: Theme.of(context).colorScheme.outlineVariant))
-                : Border(bottom: BorderSide(color: Theme.of(context).colorScheme.outlineVariant)),
+            border:
+                categoryIndex == 0
+                    ? Border.symmetric(horizontal: BorderSide(color: Theme.of(context).colorScheme.outlineVariant))
+                    : Border(bottom: BorderSide(color: Theme.of(context).colorScheme.outlineVariant)),
           ),
           child: ExpansionPanelList(
             expandIconColor: Colors.transparent,
@@ -31,20 +32,14 @@ class TagCategroyView extends ConsumerWidget {
             expansionCallback: (panelIndex, isExpanded) {},
             children: [
               ExpansionPanel(
-                  canTapOnHeader: true,
-                  isExpanded: true,
-                  headerBuilder: (context, isExpanded) => ListTile(
-                        title: Text(
-                          "${categoryIndex + 1}. ${category.title}",
-                          strutStyle: const StrutStyle(forceStrutHeight: true, leading: 0.5),
-                        ),
-                      ),
-                  body: TagView(
-                    classifierId: classifierId,
-                    subClassifierIndex: subClassifierIndex,
-                    categoryIndex: categoryIndex,
-                    category: category,
-                  )),
+                canTapOnHeader: true,
+                isExpanded: true,
+                headerBuilder:
+                    (context, isExpanded) => ListTile(
+                      title: Text("${categoryIndex + 1}. ${category.title}", strutStyle: const StrutStyle(forceStrutHeight: true, leading: 0.5)),
+                    ),
+                body: TagView(classifierId: classifierId, subClassifierIndex: subClassifierIndex, categoryIndex: categoryIndex, category: category),
+              ),
             ],
           ),
         );

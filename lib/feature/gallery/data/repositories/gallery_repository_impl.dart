@@ -1,7 +1,11 @@
+import 'package:vplus_dev/feature/gallery/domain/entities/tag.dart';
+
 import '../../domain/entities/gallery_classifier.dart';
 import '../../domain/entities/gallery_type.dart';
 import '../datasources/gallery_data_source.dart';
+import '../dtos/create_tag_request_dto.dart';
 import '../dtos/reorder_request_dto.dart';
+
 import 'gallery_repository.dart';
 
 class GalleryRepositoryImpl implements GalleryRepository {
@@ -30,5 +34,11 @@ class GalleryRepositoryImpl implements GalleryRepository {
   @override
   Future<void> reorderTag(ReorderRequestDto request) async {
     await _dataSource.reorderTag(request);
+  }
+
+  @override
+  Future<Tag> createTag(CreateTagRequestDto request) async {
+    final responseDto = await _dataSource.createTag(request);
+    return responseDto.toDomain(request.title, request.color);
   }
 }

@@ -23,7 +23,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp.router(
       title: 'Vplus Pro Dev',
       routerConfig: _appRouter.config(),
-      theme: ThemeData(colorScheme: ColorScheme.fromSeed(seedColor: Color(0xff19283c)), useMaterial3: true),
+      theme: ThemeData(colorScheme: ColorScheme.fromSeed(seedColor: Color(0xff19283c), primary: Color(0xff19283c)), useMaterial3: true),
     );
   }
 }

@@ -18,4 +18,7 @@ abstract class Tag with _$Tag {
     ///tag分類排序
     required int sort,
   }) = _Tag;
+
+  /// 創建一個空白的標籤實例
+  factory Tag.empty() => const Tag(id: 0, title: '', color: 0, sort: 0);
 }

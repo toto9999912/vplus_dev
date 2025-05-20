@@ -41,6 +41,9 @@ class AppButton extends StatelessWidget {
   /// 按鈕點擊事件
   final void Function()? onPressed;
 
+  /// 按鈕雙擊事件
+  final void Function()? onDoubleTap;
+
   /// 按鈕類型
   final ButtonVariants variant;
 
@@ -75,6 +78,7 @@ class AppButton extends StatelessWidget {
     super.key,
     required this.child,
     this.onPressed,
+    this.onDoubleTap,
     this.variant = ButtonVariants.primary,
     this.size = ButtonSize.medium,
     this.outline = false,
@@ -130,24 +134,50 @@ class AppButton extends StatelessWidget {
     final double btnHeight = height ?? sizeHeights[size]!;
     final EdgeInsetsGeometry btnPadding = padding ?? sizePaddings[size]!;
 
-    return SizedBox(
-      width: block ? double.infinity : width,
-      height: btnHeight,
-      child: ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          foregroundColor: foregroundColor,
-          backgroundColor: backgroundColor,
-          disabledBackgroundColor: backgroundColor.withValues(alpha: 0.6),
-          disabledForegroundColor: foregroundColor.withValues(alpha: 0.6),
-          padding: btnPadding,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(radius), side: BorderSide(color: borderCol, width: outline ? 1 : 0)),
-          elevation: outline ? 0 : 2,
-          shadowColor: outline ? Colors.transparent : null,
+    // 如果同時設定了單擊和雙擊功能，使用 GestureDetector 處理
+    if (onDoubleTap != null && !disabled) {
+      return SizedBox(
+        width: block ? double.infinity : width,
+        height: btnHeight,
+        child: GestureDetector(
+          onDoubleTap: onDoubleTap,
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              foregroundColor: foregroundColor,
+              backgroundColor: backgroundColor,
+              disabledBackgroundColor: backgroundColor.withValues(alpha: 0.6),
+              disabledForegroundColor: foregroundColor.withValues(alpha: 0.6),
+              padding: btnPadding,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(radius), side: BorderSide(color: borderCol, width: outline ? 1 : 0)),
+              elevation: outline ? 0 : 2,
+              shadowColor: outline ? Colors.transparent : null,
+            ),
+            onPressed: disabled ? null : onPressed,
+            child: child,
+          ),
         ),
-        onPressed: disabled ? null : onPressed,
-        child: child,
-      ),
-    );
+      );
+    } else {
+      // 如果只有單擊功能或按鈕禁用，直接使用 ElevatedButton
+      return SizedBox(
+        width: block ? double.infinity : width,
+        height: btnHeight,
+        child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            foregroundColor: foregroundColor,
+            backgroundColor: backgroundColor,
+            disabledBackgroundColor: backgroundColor.withValues(alpha: 0.6),
+            disabledForegroundColor: foregroundColor.withValues(alpha: 0.6),
+            padding: btnPadding,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(radius), side: BorderSide(color: borderCol, width: outline ? 1 : 0)),
+            elevation: outline ? 0 : 2,
+            shadowColor: outline ? Colors.transparent : null,
+          ),
+          onPressed: disabled ? null : onPressed,
+          child: child,
+        ),
+      );
+    }
   }
 
   /// 全寬按鈕
@@ -159,6 +189,7 @@ class AppButton extends StatelessWidget {
     bool outline = false,
     bool disabled = false,
     void Function()? onPressed,
+    void Function()? onDoubleTap,
     double? borderRadius,
   }) {
     return AppButton(
@@ -169,6 +200,7 @@ class AppButton extends StatelessWidget {
       block: true,
       disabled: disabled,
       onPressed: onPressed,
+      onDoubleTap: onDoubleTap,
       borderRadius: borderRadius,
       child: child,
     );
@@ -183,6 +215,7 @@ class AppButton extends StatelessWidget {
     bool block = false,
     bool disabled = false,
     void Function()? onPressed,
+    void Function()? onDoubleTap,
     double? borderRadius,
   }) {
     return AppButton(
@@ -193,6 +226,7 @@ class AppButton extends StatelessWidget {
       block: block,
       disabled: disabled,
       onPressed: onPressed,
+      onDoubleTap: onDoubleTap,
       borderRadius: borderRadius,
       child: child,
     );

@@ -1,5 +1,6 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../data/dtos/create_tag_request_dto.dart';
 import '../../data/dtos/reorder_request_dto.dart';
 import '../../domain/entities/gallery_classifier.dart';
 import 'gallery_providers.dart';
@@ -148,7 +149,56 @@ class ClassifierTagNotifier extends _$ClassifierTagNotifier {
     ref.read(snackbarMessageNotifierProvider.notifier).showError(message);
   }
 
-  void addTag() {}
+  // ...existing code...
+
+  // 新增標籤
+  void createTag(int subClassifierIndex, int categoryIndex, String title, int color) async {
+    final currentState = state;
+    if (currentState is AsyncData<Classifier>) {
+      final originalClassifier = currentState.value;
+
+      // 檢查索引有效性
+      if (originalClassifier.subClassifiers == null ||
+          subClassifierIndex >= originalClassifier.subClassifiers!.length ||
+          originalClassifier.subClassifiers![subClassifierIndex].categories == null ||
+          categoryIndex >= originalClassifier.subClassifiers![subClassifierIndex].categories!.length) {
+        showErrorMessage('無法新增標籤: 索引無效');
+        return;
+      }
+
+      final category = originalClassifier.subClassifiers![subClassifierIndex].categories![categoryIndex];
+
+      try {
+        // 創建請求DTO
+        final request = CreateTagRequestDto(categoryId: category.id, title: title, color: color);
+
+        // 從 repository 添加標籤
+        final repository = ref.read(galleryRepositoryProvider);
+        final newTag = await repository.createTag(request);
+
+        // 更新本地 UI 狀態
+        // 1. 更新標籤列表
+        final updatedTags = [...category.tags, newTag];
+
+        // 2. 更新分類
+        final updatedCategory = category.copyWith(tags: updatedTags);
+        final updatedCategories = List.of(originalClassifier.subClassifiers![subClassifierIndex].categories!);
+        updatedCategories[categoryIndex] = updatedCategory;
+
+        // 3. 更新子分類器
+        final updatedSubClassifier = originalClassifier.subClassifiers![subClassifierIndex].copyWith(categories: updatedCategories);
+        final updatedSubClassifiers = List.of(originalClassifier.subClassifiers!);
+        updatedSubClassifiers[subClassifierIndex] = updatedSubClassifier;
+
+        // 4. 更新整個分類器
+        final updatedClassifier = originalClassifier.copyWith(subClassifiers: updatedSubClassifiers);
+        state = AsyncData(updatedClassifier);
+      } catch (e) {
+        // 發生錯誤時通知用戶
+        showErrorMessage('新增標籤失敗: ${e.toString()}');
+      }
+    }
+  }
 
   void editTag() {}
 
