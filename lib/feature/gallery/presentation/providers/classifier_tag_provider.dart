@@ -1,9 +1,11 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../data/dtos/create_tag_request_dto.dart';
+import '../../data/dtos/tag_request_dto.dart';
 import '../../data/dtos/reorder_request_dto.dart';
 import '../../domain/entities/gallery_classifier.dart';
+import '../../domain/entities/tag.dart';
 import 'gallery_providers.dart';
+import 'selected_tag_provider.dart';
 import 'snackbar_message_provider.dart';
 
 part 'classifier_tag_provider.g.dart';
@@ -142,9 +144,6 @@ class ClassifierTagNotifier extends _$ClassifierTagNotifier {
 
   // 顯示錯誤訊息，根據你的應用架構，選擇一種適合的方式
   void showErrorMessage(String message) {
-    // 方式1: 使用全局通知服務 (推薦)
-    // ref.read(notificationServiceProvider).showError(message);
-
     // 方式2: 更新本地錯誤狀態讓視圖層處理
     ref.read(snackbarMessageNotifierProvider.notifier).showError(message);
   }
@@ -170,7 +169,7 @@ class ClassifierTagNotifier extends _$ClassifierTagNotifier {
 
       try {
         // 創建請求DTO
-        final request = CreateTagRequestDto(categoryId: category.id, title: title, color: color);
+        final request = TagRequestDto(categoryId: category.id, title: title, color: color);
 
         // 從 repository 添加標籤
         final repository = ref.read(galleryRepositoryProvider);
@@ -200,7 +199,103 @@ class ClassifierTagNotifier extends _$ClassifierTagNotifier {
     }
   }
 
-  void editTag() {}
+  // 編輯標籤（樂觀更新模式）
+  void editTag(int subClassifierIndex, int categoryIndex, int tagId, String title, int color) async {
+    final currentState = state;
+    if (currentState is AsyncData<Classifier>) {
+      final originalClassifier = currentState.value;
+
+      // 檢查索引有效性
+      if (originalClassifier.subClassifiers == null ||
+          subClassifierIndex >= originalClassifier.subClassifiers!.length ||
+          originalClassifier.subClassifiers![subClassifierIndex].categories == null ||
+          categoryIndex >= originalClassifier.subClassifiers![subClassifierIndex].categories!.length) {
+        showErrorMessage('無法編輯標籤: 索引無效');
+        return;
+      }
+
+      final category = originalClassifier.subClassifiers![subClassifierIndex].categories![categoryIndex];
+      final tagIndex = category.tags.indexWhere((tag) => tag.id == tagId);
+
+      if (tagIndex == -1) {
+        showErrorMessage('無法編輯標籤: 找不到標籤');
+        return;
+      }
+
+      // 獲取原始標籤對象
+      final originalTag = category.tags[tagIndex];
+
+      // 創建更新後的標籤對象（在本地直接創建，不依賴伺服器返回）
+      final updatedTag = originalTag.copyWith(title: title, color: color);
+
+      try {
+        // 先進行本地狀態更新（樂觀更新）
+        // 1. 更新標籤列表
+        final updatedTags = List.of(category.tags);
+        updatedTags[tagIndex] = updatedTag;
+
+        // 2. 更新分類
+        final updatedCategory = category.copyWith(tags: updatedTags);
+        final updatedCategories = List.of(originalClassifier.subClassifiers![subClassifierIndex].categories!);
+        updatedCategories[categoryIndex] = updatedCategory;
+
+        // 3. 更新子分類器
+        final updatedSubClassifier = originalClassifier.subClassifiers![subClassifierIndex].copyWith(categories: updatedCategories);
+        final updatedSubClassifiers = List.of(originalClassifier.subClassifiers!);
+        updatedSubClassifiers[subClassifierIndex] = updatedSubClassifier;
+
+        // 4. 更新整個分類器
+        final updatedClassifier = originalClassifier.copyWith(subClassifiers: updatedSubClassifiers);
+        state = AsyncData(updatedClassifier);
+
+        // 5. 如果有選中的標籤也需要更新
+        _updateSelectedTags(tagId, updatedTag);
+
+        // 通知成功（提前通知用戶，增強用戶體驗）
+        ref.read(snackbarMessageNotifierProvider.notifier).showSuccess('標籤已更新');
+
+        // 創建請求DTO
+        final request = TagRequestDto(categoryId: category.id, title: title, color: color);
+
+        // 非同步發送請求到後端
+        final repository = ref.read(galleryRepositoryProvider);
+        await repository.editTag(tagId, request);
+
+        // 請求成功，不需要額外處理（已經更新了UI）
+      } catch (e) {
+        // 發生錯誤時通知用戶並回滾
+        showErrorMessage('編輯標籤失敗: ${e.toString()}');
+
+        // 回滾狀態到原始狀態
+        state = AsyncData(originalClassifier);
+
+        // 如果在更新選中標籤時出錯，也需要回滾
+        final selectedTags = ref.read(selectedTagsProvider);
+        final tagIsSelected = selectedTags.any((t) => t.id == tagId);
+        if (tagIsSelected) {
+          // 回滾選中標籤狀態
+          final selectedTagsNotifier = ref.read(selectedTagsProvider.notifier);
+          selectedTagsNotifier.removeTag(tagId);
+          selectedTagsNotifier.toggleTag(originalTag);
+        }
+      }
+    }
+  }
+
+  // 更新所選標籤的輔助方法
+  void _updateSelectedTags(int tagId, Tag updatedTag) {
+    // 獲取selectedTags提供者
+    final selectedTagsNotifier = ref.read(selectedTagsProvider.notifier);
+    final selectedTags = ref.read(selectedTagsProvider);
+
+    // 檢查編輯的標籤是否在選定列表中
+    final tagIsSelected = selectedTags.any((tag) => tag.id == tagId);
+    if (tagIsSelected) {
+      // 如果是，更新選定的標籤列表
+      selectedTagsNotifier.removeTag(tagId);
+      selectedTagsNotifier.toggleTag(updatedTag);
+    }
+  }
 
   void deleteTag() {}
 

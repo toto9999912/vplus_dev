@@ -118,12 +118,12 @@ class TagView extends ConsumerWidget {
                     selectedTagsNotifier.toggleTag(tag);
                   },
                   onDoubleTap: () async {
+                    // 編輯現有標籤
                     final result = await AppFormDialog.show<Tag>(
                       context: context,
-                      title: '新增Tag',
-                      initialData: Tag.empty(),
+                      title: '編輯標籤',
+                      initialData: tag, // 使用現有標籤作為初始數據
                       bodyBuilder: (context, initialData, onDataChanged) {
-                        // 創建表單元素
                         return Column(
                           children: [
                             Container(
@@ -141,7 +141,6 @@ class TagView extends ConsumerWidget {
                                 ),
                                 initialValue: initialData?.title,
                                 onChanged: (value) {
-                                  // 即時更新數據
                                   final newData = initialData?.copyWith(title: value);
                                   onDataChanged(newData);
                                 },
@@ -149,7 +148,7 @@ class TagView extends ConsumerWidget {
                             ),
 
                             ColorPicker(
-                              initialColor: AppColors.white,
+                              initialColor: defaultColors[initialData?.color ?? 0],
                               onColorChanged: (color) {
                                 final newData = initialData?.copyWith(color: defaultColors.indexOf(color));
                                 onDataChanged(newData);
@@ -161,9 +160,10 @@ class TagView extends ConsumerWidget {
                     );
                     if (result == null) return;
 
+                    // 呼叫編輯標籤方法
                     ref
                         .read(classifierTagNotifierProvider(classifierId).notifier)
-                        .createTag(subClassifierIndex, categoryIndex, result.title, result.color);
+                        .editTag(subClassifierIndex, categoryIndex, tag.id, result.title, result.color);
                   },
                 )
                 : AppButton.outline(
@@ -187,12 +187,12 @@ class TagView extends ConsumerWidget {
                     selectedTagsNotifier.toggleTag(tag);
                   },
                   onDoubleTap: () async {
+                    // 編輯現有標籤
                     final result = await AppFormDialog.show<Tag>(
                       context: context,
-                      title: '新增Tag',
-                      initialData: Tag.empty(),
+                      title: '編輯標籤',
+                      initialData: tag, // 使用現有標籤作為初始數據
                       bodyBuilder: (context, initialData, onDataChanged) {
-                        // 創建表單元素
                         return Column(
                           children: [
                             Container(
@@ -210,7 +210,6 @@ class TagView extends ConsumerWidget {
                                 ),
                                 initialValue: initialData?.title,
                                 onChanged: (value) {
-                                  // 即時更新數據
                                   final newData = initialData?.copyWith(title: value);
                                   onDataChanged(newData);
                                 },
@@ -218,7 +217,7 @@ class TagView extends ConsumerWidget {
                             ),
 
                             ColorPicker(
-                              initialColor: AppColors.white,
+                              initialColor: defaultColors[initialData?.color ?? 0],
                               onColorChanged: (color) {
                                 final newData = initialData?.copyWith(color: defaultColors.indexOf(color));
                                 onDataChanged(newData);
@@ -230,9 +229,10 @@ class TagView extends ConsumerWidget {
                     );
                     if (result == null) return;
 
+                    // 呼叫編輯標籤方法
                     ref
                         .read(classifierTagNotifierProvider(classifierId).notifier)
-                        .createTag(subClassifierIndex, categoryIndex, result.title, result.color);
+                        .editTag(subClassifierIndex, categoryIndex, tag.id, result.title, result.color);
                   },
                 );
           }).toList(),

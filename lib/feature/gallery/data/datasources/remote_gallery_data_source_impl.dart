@@ -1,6 +1,6 @@
 import 'package:vplus_dev/core/network/api_client.dart';
 
-import '../dtos/create_tag_request_dto.dart';
+import '../dtos/tag_request_dto.dart';
 import '../dtos/gallery_classifier_dto.dart';
 import '../dtos/gallery_type_dto.dart';
 import '../dtos/reorder_request_dto.dart';
@@ -43,7 +43,7 @@ class RemoteGalleryDataSourceImpl implements GalleryDataSource {
   }
 
   @override
-  Future<TagResponseDto> createTag(CreateTagRequestDto request) async {
+  Future<TagResponseDto> createTag(TagRequestDto request) async {
     final response = await client.post(
       'gallery/tag',
       withToken: true,
@@ -51,5 +51,15 @@ class RemoteGalleryDataSourceImpl implements GalleryDataSource {
       fromJsonT: (json) => TagResponseDto.fromJson(json as Map<String, dynamic>),
     );
     return response.data;
+  }
+
+  @override
+  Future<void> editTag(int tagId, TagRequestDto request) async {
+    await client.put(
+      'gallery/tag/$tagId',
+      withToken: true,
+      body: request.toJson(),
+      fromJsonT: (json) => TagResponseDto.fromJson(json as Map<String, dynamic>),
+    );
   }
 }

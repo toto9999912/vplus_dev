@@ -1,4 +1,4 @@
-import 'package:vplus_dev/feature/gallery/data/dtos/create_tag_request_dto.dart';
+import 'package:vplus_dev/feature/gallery/data/dtos/tag_request_dto.dart';
 import 'package:vplus_dev/feature/gallery/domain/entities/tag.dart';
 
 import '../../domain/entities/gallery_classifier.dart';
@@ -14,5 +14,7 @@ abstract class GalleryRepository {
 
   Future<void> reorderTag(ReorderRequestDto request);
 
-  Future<Tag> createTag(CreateTagRequestDto request);
+  Future<Tag> createTag(TagRequestDto request);
+
+  Future<void> editTag(int tagId, TagRequestDto request);
 }
