@@ -1,7 +1,6 @@
 // lib/feature/upload/providers/upload_service_provider.dart
 import 'dart:io';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:file_picker/file_picker.dart';
@@ -48,40 +47,6 @@ class UploadService {
     }
 
     return status.isGranted;
-  }
-
-  /// 顯示底部彈跳視窗選擇上傳類型
-  Future<UploadType?> showUploadOptionsBottomSheet(BuildContext context) async {
-    return await showModalBottomSheet<UploadType>(
-      context: context,
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
-      builder:
-          (context) => SafeArea(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 16),
-                  child: Text('選擇上傳類型', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                ),
-                const Divider(height: 1),
-                _buildOptionTile(context, icon: Icons.photo, title: '圖片', onTap: () => Navigator.pop(context, UploadType.image)),
-                const Divider(height: 1),
-                _buildOptionTile(context, icon: Icons.videocam, title: '影片', onTap: () => Navigator.pop(context, UploadType.video)),
-                const Divider(height: 1),
-                _buildOptionTile(context, icon: Icons.insert_drive_file, title: '檔案', onTap: () => Navigator.pop(context, UploadType.file)),
-                Container(height: 8, color: Colors.grey.shade200),
-                _buildOptionTile(context, icon: Icons.close, title: '取消', onTap: () => Navigator.pop(context)),
-              ],
-            ),
-          ),
-    );
-  }
-
-  /// 構建選項列表項
-  Widget _buildOptionTile(BuildContext context, {required IconData icon, required String title, required VoidCallback onTap}) {
-    return ListTile(leading: Icon(icon), title: Text(title), onTap: onTap);
   }
 
   /// 處理上傳選項的選擇

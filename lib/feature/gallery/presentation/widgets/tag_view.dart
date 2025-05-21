@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reorderable_grid_view/reorderable_grid_view.dart';
 import 'package:vplus_dev/core/constants/app_color.dart';
+import 'package:vplus_dev/core/providers/service_providers.dart';
 import 'package:vplus_dev/shared/widgets/button/app_button.dart';
 import 'package:vplus_dev/shared/widgets/form/app_form_dialog.dart';
 
@@ -123,8 +124,17 @@ class TagView extends ConsumerWidget {
       initialData: tag,
       customAction: IconButton(
         onPressed: () {
-          ref.read(classifierTagNotifierProvider(classifierId).notifier).deleteTag(subClassifierIndex, categoryIndex, tag.id);
-          Navigator.of(context, rootNavigator: true).pop();
+          ref
+              .read(dialogServiceProvider)
+              .showWarningDialog(
+                title: '確定刪除標籤？',
+                desc: '刪除後無法恢復，請確認是否刪除',
+                onOkPress: () {
+                  ref.read(classifierTagNotifierProvider(classifierId).notifier).deleteTag(subClassifierIndex, categoryIndex, tag.id);
+                  Navigator.of(context, rootNavigator: true).pop();
+                },
+                onCancelPress: () {},
+              );
         },
         icon: const Icon(Icons.delete),
       ),

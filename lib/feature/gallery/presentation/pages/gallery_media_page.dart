@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:reorderable_grid_view/reorderable_grid_view.dart';
 import 'package:vplus_dev/core/router/app_router.gr.dart';
-import 'package:vplus_dev/shared/models/option_item.dart';
+import 'package:vplus_dev/shared/models/bottom_sheet_option.dart';
 
 import '../../domain/enums/media_action_option.dart';
 import '../../domain/enums/view_mode.dart';
@@ -26,7 +26,7 @@ class GalleryMediaPage extends ConsumerStatefulWidget {
 
 class _GalleryMediaPageState extends ConsumerState<GalleryMediaPage> {
   final DragSelectGridViewController controller = DragSelectGridViewController();
-  List<OptionItem<MediaActionOption>> _actionOptions = [];
+  List<BottomSheetOption<MediaActionOption>> _actionOptions = [];
 
   // 將監聽器函數存儲為成員變量以確保正確移除
   void _onSelectionChanged() {
@@ -46,7 +46,15 @@ class _GalleryMediaPageState extends ConsumerState<GalleryMediaPage> {
   void _initializeActionOptions() {
     _actionOptions =
         MediaActionOption.values
-            .map((option) => OptionItem<MediaActionOption>(title: option.title, value: option, icon: option.icon, color: option.color))
+            .map(
+              (option) => BottomSheetOption<MediaActionOption>(
+                title: option.title,
+                value: option,
+                icon: option.icon,
+                iconColor: option.color,
+                textColor: option.color,
+              ),
+            )
             .toList();
   }
 
@@ -83,9 +91,9 @@ class _GalleryMediaPageState extends ConsumerState<GalleryMediaPage> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(option.icon, color: option.color, size: 30),
+                    Icon(option.icon, color: option.iconColor, size: 30),
                     const SizedBox(height: 8),
-                    Text(option.title, textAlign: TextAlign.center, style: TextStyle(fontSize: 12, color: option.color)),
+                    Text(option.title, textAlign: TextAlign.center, style: TextStyle(fontSize: 12, color: option.textColor)),
                   ],
                 ),
               );

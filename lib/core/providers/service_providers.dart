@@ -6,6 +6,9 @@ import 'package:vplus_dev/core/service/storage_service.dart';
 import 'package:vplus_dev/core/service/token_service.dart';
 import 'package:vplus_dev/core/service/user_service.dart';
 
+import '../router/app_router.dart';
+import '../service/dialog_service.dart';
+
 // 這將生成對應的 .g.dart 檔案
 part 'service_providers.g.dart';
 
@@ -29,6 +32,9 @@ UserService userService(Ref ref) {
   final storageService = ref.watch(storageServiceProvider);
   return UserService(storageService);
 }
+
+@Riverpod(keepAlive: true)
+DialogService dialogService(Ref ref) => DialogService(rootNavigatorKey);
 
 /// 初始化服務提供者的方法
 /// 返回一個 Override 列表，用於覆蓋 ProviderScope
