@@ -18,4 +18,16 @@ class RemoteMediaDataSourceImpl implements MediaDataSource {
     );
     return response.data;
   }
+
+  @override
+  Future<void> uploadMedia() async {
+    FormData formData = FormData.fromMap({
+      // image,video,file
+      "uploadType": 'image',
+      "file": await MultipartFile.fromFile(file.path, filename: fileName),
+      "tagsId": tags.map((e) => e.id).toList(),
+    });
+
+    await client.postForm('gallery/tag/$tagId');
+  }
 }

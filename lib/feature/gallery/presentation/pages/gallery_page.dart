@@ -5,7 +5,10 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:vplus_dev/core/constants/app_color.dart';
 import 'package:vplus_dev/core/providers/service_providers.dart';
 import 'package:vplus_dev/core/router/app_router.gr.dart';
+import 'package:vplus_dev/feature/upload/enums/media_pick_error.dart';
 import 'package:vplus_dev/feature/upload/enums/upload_type.dart';
+import 'package:vplus_dev/feature/upload/models/media_pick_result.dart';
+import 'package:vplus_dev/feature/upload/providers/upload_progress_provider.dart';
 import 'package:vplus_dev/feature/upload/providers/upload_service_provider.dart';
 import 'package:vplus_dev/shared/enum/access_mode.dart';
 import 'package:vplus_dev/shared/models/bottom_sheet_option.dart';
@@ -51,15 +54,81 @@ class GalleryHeaderPage extends ConsumerWidget {
       print('用戶選擇了: $result');
 
       // 根據選擇執行不同操作
-      //   switch (result) {
-      //     case 'camera':
-      //       // 開啟相機
-      //       break;
-      //     case 'gallery':
-      //       // 開啟圖庫
-      //       break;
-      //     // 處理其他選項...
-      //   }
+      switch (result) {
+        case UploadType.camera:
+          final cameraResult = await uploadService.pickImageFromCamera(maxWidth: 1080, maxHeight: 1080, imageQuality: 80);
+
+          // 開啟相機
+          break;
+        // 開啟圖片選擇器
+        case UploadType.image:
+        // 開啟影片選擇器
+        case UploadType.video:
+        // 開啟檔案選擇器
+        case UploadType.file:
+          final pickResult = await uploadService.handleUploadOptionSelection(
+            result,
+            maxWidth: 1080,
+            maxHeight: 1080,
+            imageQuality: 80,
+            allowMultiple: true,
+          );
+          if (pickResult.isSuccess && pickResult.data != null) {
+            // 處理選擇的媒體文件
+            handleMediaResult(ref, pickResult.data!);
+          } else {
+            // 處理錯誤
+            handlePickError(ref, pickResult.error, pickResult.errorMessage);
+          }
+          break;
+
+        case UploadType.link:
+          // 開啟連結掃描器
+          break;
+
+        case UploadType.text:
+          // 開啟文字檔編輯器
+          break;
+
+        case UploadType.ai:
+          // 開啟AI圖像分類器
+          break;
+      }
+    }
+  }
+
+  // 處理選擇的媒體結果
+  void handleMediaResult(WidgetRef ref, List<MediaPickResult> mediaResults) {
+    // 初始化上傳進度追蹤
+    ref.read(uploadProgressNotifierProvider.notifier).initializeProgress(mediaResults.length);
+
+    // 這裡可以將媒體結果傳遞給您的上傳處理邏輯
+    // 例如上傳到伺服器、保存到本地數據庫等
+    for (final media in mediaResults) {
+      print('處理文件: ${media.fileName}, 大小: ${media.fileSize}, 類型: ${media.mimeType}');
+      // TODO: 實現實際的上傳邏輯
+    }
+  }
+
+  // 處理選擇媒體時的錯誤
+  void handlePickError(WidgetRef ref, MediaPickError? error, String? errorMessage) {
+    // 顯示錯誤訊息給用戶
+    if (error != null) {
+      String message = errorMessage ?? '未知錯誤';
+      switch (error) {
+        case MediaPickError.permissionDenied:
+          message = '需要權限才能訪問媒體';
+          break;
+        case MediaPickError.cancelled:
+          // 用戶取消，通常不需要顯示錯誤
+          return;
+        case MediaPickError.fileNotFound:
+          message = '找不到選擇的文件';
+          break;
+        case MediaPickError.unknownError:
+          message = '處理媒體時發生錯誤: $errorMessage';
+          break;
+      }
     }
   }
 
