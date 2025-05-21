@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:vplus_dev/core/network/api_client.dart';
 
 import '../dtos/gallery_media_dto.dart';
