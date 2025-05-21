@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:vplus_dev/core/network/api_client.dart';
 
@@ -21,14 +23,21 @@ class RemoteMediaDataSourceImpl implements MediaDataSource {
   }
 
   @override
-  Future<void> uploadMedia() async {
+  Future<void> uploadGalleryMedia({
+    required String uploadType,
+    required int galleryTypeId,
+    required File file,
+    required String fileName,
+    required List<int> tagsId,
+    ProgressCallback? onSendProgress,
+  }) async {
     FormData formData = FormData.fromMap({
       // image,video,file
-      "uploadType": 'image',
+      "uploadType": uploadType,
       "file": await MultipartFile.fromFile(file.path, filename: fileName),
-      "tagsId": tags.map((e) => e.id).toList(),
+      "tagsId": tagsId,
     });
 
-    await client.postForm('gallery/tag/$tagId');
+    await client.postForm('upload/$galleryTypeId', data: formData, onSendProgress: onSendProgress);
   }
 }
