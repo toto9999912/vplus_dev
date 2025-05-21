@@ -47,6 +47,8 @@ class AppRouter extends RootStackRouter {
             AutoRoute(path: 'editor', page: GalleryEditorRoute.page),
           ],
         ),
+
+        AutoRoute(path: 'project', page: ProjectRoute.page, children: [AutoRoute(path: 'list', page: ProjectListRoute.page, initial: true)]),
       ],
     ),
   ];

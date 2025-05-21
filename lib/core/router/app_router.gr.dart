@@ -9,8 +9,8 @@
 // coverage:ignore-file
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'package:auto_route/auto_route.dart' as _i10;
-import 'package:flutter/material.dart' as _i11;
+import 'package:auto_route/auto_route.dart' as _i11;
+import 'package:flutter/material.dart' as _i12;
 import 'package:vplus_dev/feature/about_me/presentation/pages/about_me_dashboard_page.dart'
     as _i1;
 import 'package:vplus_dev/feature/about_me/presentation/pages/about_me_page.dart'
@@ -18,9 +18,9 @@ import 'package:vplus_dev/feature/about_me/presentation/pages/about_me_page.dart
 import 'package:vplus_dev/feature/auth/presentation/pages/login_page.dart'
     as _i8;
 import 'package:vplus_dev/feature/gallery/domain/entities/gallery_media.dart'
-    as _i12;
-import 'package:vplus_dev/feature/gallery/domain/enums/media_action.dart'
     as _i13;
+import 'package:vplus_dev/feature/gallery/domain/enums/media_action.dart'
+    as _i14;
 import 'package:vplus_dev/feature/gallery/presentation/pages/gallery_editor_page.dart'
     as _i3;
 import 'package:vplus_dev/feature/gallery/presentation/pages/gallery_instagram_page.dart'
@@ -31,18 +31,20 @@ import 'package:vplus_dev/feature/gallery/presentation/pages/gallery_page.dart'
     as _i4;
 import 'package:vplus_dev/feature/home/presentation/pages/home_page.dart'
     as _i7;
-import 'package:vplus_dev/feature/splash/presentation/pages/splash_page.dart'
+import 'package:vplus_dev/feature/project/presentation/pages/project_page.dart'
     as _i9;
+import 'package:vplus_dev/feature/splash/presentation/pages/splash_page.dart'
+    as _i10;
 
 /// generated route for
 /// [_i1.AboutMeDashboardPage]
-class AboutMeDashboardRoute extends _i10.PageRouteInfo<void> {
-  const AboutMeDashboardRoute({List<_i10.PageRouteInfo>? children})
+class AboutMeDashboardRoute extends _i11.PageRouteInfo<void> {
+  const AboutMeDashboardRoute({List<_i11.PageRouteInfo>? children})
     : super(AboutMeDashboardRoute.name, initialChildren: children);
 
   static const String name = 'AboutMeDashboardRoute';
 
-  static _i10.PageInfo page = _i10.PageInfo(
+  static _i11.PageInfo page = _i11.PageInfo(
     name,
     builder: (data) {
       return const _i1.AboutMeDashboardPage();
@@ -52,13 +54,13 @@ class AboutMeDashboardRoute extends _i10.PageRouteInfo<void> {
 
 /// generated route for
 /// [_i2.AboutMePage]
-class AboutMeRoute extends _i10.PageRouteInfo<void> {
-  const AboutMeRoute({List<_i10.PageRouteInfo>? children})
+class AboutMeRoute extends _i11.PageRouteInfo<void> {
+  const AboutMeRoute({List<_i11.PageRouteInfo>? children})
     : super(AboutMeRoute.name, initialChildren: children);
 
   static const String name = 'AboutMeRoute';
 
-  static _i10.PageInfo page = _i10.PageInfo(
+  static _i11.PageInfo page = _i11.PageInfo(
     name,
     builder: (data) {
       return const _i2.AboutMePage();
@@ -68,12 +70,12 @@ class AboutMeRoute extends _i10.PageRouteInfo<void> {
 
 /// generated route for
 /// [_i3.GalleryEditorPage]
-class GalleryEditorRoute extends _i10.PageRouteInfo<GalleryEditorRouteArgs> {
+class GalleryEditorRoute extends _i11.PageRouteInfo<GalleryEditorRouteArgs> {
   GalleryEditorRoute({
-    _i11.Key? key,
-    required _i12.GalleryMedia media,
-    required _i13.MediaAction initialTab,
-    List<_i10.PageRouteInfo>? children,
+    _i12.Key? key,
+    required _i13.GalleryMedia media,
+    required _i14.MediaAction initialTab,
+    List<_i11.PageRouteInfo>? children,
   }) : super(
          GalleryEditorRoute.name,
          args: GalleryEditorRouteArgs(
@@ -86,7 +88,7 @@ class GalleryEditorRoute extends _i10.PageRouteInfo<GalleryEditorRouteArgs> {
 
   static const String name = 'GalleryEditorRoute';
 
-  static _i10.PageInfo page = _i10.PageInfo(
+  static _i11.PageInfo page = _i11.PageInfo(
     name,
     builder: (data) {
       final args = data.argsAs<GalleryEditorRouteArgs>();
@@ -106,11 +108,11 @@ class GalleryEditorRouteArgs {
     required this.initialTab,
   });
 
-  final _i11.Key? key;
+  final _i12.Key? key;
 
-  final _i12.GalleryMedia media;
+  final _i13.GalleryMedia media;
 
-  final _i13.MediaAction initialTab;
+  final _i14.MediaAction initialTab;
 
   @override
   String toString() {
@@ -120,13 +122,13 @@ class GalleryEditorRouteArgs {
 
 /// generated route for
 /// [_i4.GalleryHeaderPage]
-class GalleryHeaderRoute extends _i10.PageRouteInfo<void> {
-  const GalleryHeaderRoute({List<_i10.PageRouteInfo>? children})
+class GalleryHeaderRoute extends _i11.PageRouteInfo<void> {
+  const GalleryHeaderRoute({List<_i11.PageRouteInfo>? children})
     : super(GalleryHeaderRoute.name, initialChildren: children);
 
   static const String name = 'GalleryHeaderRoute';
 
-  static _i10.PageInfo page = _i10.PageInfo(
+  static _i11.PageInfo page = _i11.PageInfo(
     name,
     builder: (data) {
       return const _i4.GalleryHeaderPage();
@@ -137,11 +139,11 @@ class GalleryHeaderRoute extends _i10.PageRouteInfo<void> {
 /// generated route for
 /// [_i5.GalleryInstagramPage]
 class GalleryInstagramRoute
-    extends _i10.PageRouteInfo<GalleryInstagramRouteArgs> {
+    extends _i11.PageRouteInfo<GalleryInstagramRouteArgs> {
   GalleryInstagramRoute({
     int? initialIndex,
-    _i11.Key? key,
-    List<_i10.PageRouteInfo>? children,
+    _i12.Key? key,
+    List<_i11.PageRouteInfo>? children,
   }) : super(
          GalleryInstagramRoute.name,
          args: GalleryInstagramRouteArgs(initialIndex: initialIndex, key: key),
@@ -150,7 +152,7 @@ class GalleryInstagramRoute
 
   static const String name = 'GalleryInstagramRoute';
 
-  static _i10.PageInfo page = _i10.PageInfo(
+  static _i11.PageInfo page = _i11.PageInfo(
     name,
     builder: (data) {
       final args = data.argsAs<GalleryInstagramRouteArgs>(
@@ -169,7 +171,7 @@ class GalleryInstagramRouteArgs {
 
   final int? initialIndex;
 
-  final _i11.Key? key;
+  final _i12.Key? key;
 
   @override
   String toString() {
@@ -179,13 +181,13 @@ class GalleryInstagramRouteArgs {
 
 /// generated route for
 /// [_i6.GalleryMediaPage]
-class GalleryMediaRoute extends _i10.PageRouteInfo<void> {
-  const GalleryMediaRoute({List<_i10.PageRouteInfo>? children})
+class GalleryMediaRoute extends _i11.PageRouteInfo<void> {
+  const GalleryMediaRoute({List<_i11.PageRouteInfo>? children})
     : super(GalleryMediaRoute.name, initialChildren: children);
 
   static const String name = 'GalleryMediaRoute';
 
-  static _i10.PageInfo page = _i10.PageInfo(
+  static _i11.PageInfo page = _i11.PageInfo(
     name,
     builder: (data) {
       return const _i6.GalleryMediaPage();
@@ -195,13 +197,13 @@ class GalleryMediaRoute extends _i10.PageRouteInfo<void> {
 
 /// generated route for
 /// [_i4.GalleryPage]
-class GalleryRoute extends _i10.PageRouteInfo<void> {
-  const GalleryRoute({List<_i10.PageRouteInfo>? children})
+class GalleryRoute extends _i11.PageRouteInfo<void> {
+  const GalleryRoute({List<_i11.PageRouteInfo>? children})
     : super(GalleryRoute.name, initialChildren: children);
 
   static const String name = 'GalleryRoute';
 
-  static _i10.PageInfo page = _i10.PageInfo(
+  static _i11.PageInfo page = _i11.PageInfo(
     name,
     builder: (data) {
       return const _i4.GalleryPage();
@@ -211,13 +213,13 @@ class GalleryRoute extends _i10.PageRouteInfo<void> {
 
 /// generated route for
 /// [_i4.GalleryViewScreen]
-class GalleryViewRoute extends _i10.PageRouteInfo<void> {
-  const GalleryViewRoute({List<_i10.PageRouteInfo>? children})
+class GalleryViewRoute extends _i11.PageRouteInfo<void> {
+  const GalleryViewRoute({List<_i11.PageRouteInfo>? children})
     : super(GalleryViewRoute.name, initialChildren: children);
 
   static const String name = 'GalleryViewRoute';
 
-  static _i10.PageInfo page = _i10.PageInfo(
+  static _i11.PageInfo page = _i11.PageInfo(
     name,
     builder: (data) {
       return const _i4.GalleryViewScreen();
@@ -227,13 +229,13 @@ class GalleryViewRoute extends _i10.PageRouteInfo<void> {
 
 /// generated route for
 /// [_i4.GalleryWrapperScreen]
-class GalleryWrapperRoute extends _i10.PageRouteInfo<void> {
-  const GalleryWrapperRoute({List<_i10.PageRouteInfo>? children})
+class GalleryWrapperRoute extends _i11.PageRouteInfo<void> {
+  const GalleryWrapperRoute({List<_i11.PageRouteInfo>? children})
     : super(GalleryWrapperRoute.name, initialChildren: children);
 
   static const String name = 'GalleryWrapperRoute';
 
-  static _i10.PageInfo page = _i10.PageInfo(
+  static _i11.PageInfo page = _i11.PageInfo(
     name,
     builder: (data) {
       return const _i4.GalleryWrapperScreen();
@@ -243,13 +245,13 @@ class GalleryWrapperRoute extends _i10.PageRouteInfo<void> {
 
 /// generated route for
 /// [_i7.HomePage]
-class HomeRoute extends _i10.PageRouteInfo<void> {
-  const HomeRoute({List<_i10.PageRouteInfo>? children})
+class HomeRoute extends _i11.PageRouteInfo<void> {
+  const HomeRoute({List<_i11.PageRouteInfo>? children})
     : super(HomeRoute.name, initialChildren: children);
 
   static const String name = 'HomeRoute';
 
-  static _i10.PageInfo page = _i10.PageInfo(
+  static _i11.PageInfo page = _i11.PageInfo(
     name,
     builder: (data) {
       return const _i7.HomePage();
@@ -259,13 +261,13 @@ class HomeRoute extends _i10.PageRouteInfo<void> {
 
 /// generated route for
 /// [_i8.LoginPage]
-class LoginRoute extends _i10.PageRouteInfo<void> {
-  const LoginRoute({List<_i10.PageRouteInfo>? children})
+class LoginRoute extends _i11.PageRouteInfo<void> {
+  const LoginRoute({List<_i11.PageRouteInfo>? children})
     : super(LoginRoute.name, initialChildren: children);
 
   static const String name = 'LoginRoute';
 
-  static _i10.PageInfo page = _i10.PageInfo(
+  static _i11.PageInfo page = _i11.PageInfo(
     name,
     builder: (data) {
       return const _i8.LoginPage();
@@ -274,17 +276,49 @@ class LoginRoute extends _i10.PageRouteInfo<void> {
 }
 
 /// generated route for
-/// [_i9.SplashPage]
-class SplashRoute extends _i10.PageRouteInfo<void> {
-  const SplashRoute({List<_i10.PageRouteInfo>? children})
+/// [_i9.ProjectListPage]
+class ProjectListRoute extends _i11.PageRouteInfo<void> {
+  const ProjectListRoute({List<_i11.PageRouteInfo>? children})
+    : super(ProjectListRoute.name, initialChildren: children);
+
+  static const String name = 'ProjectListRoute';
+
+  static _i11.PageInfo page = _i11.PageInfo(
+    name,
+    builder: (data) {
+      return const _i9.ProjectListPage();
+    },
+  );
+}
+
+/// generated route for
+/// [_i9.ProjectPage]
+class ProjectRoute extends _i11.PageRouteInfo<void> {
+  const ProjectRoute({List<_i11.PageRouteInfo>? children})
+    : super(ProjectRoute.name, initialChildren: children);
+
+  static const String name = 'ProjectRoute';
+
+  static _i11.PageInfo page = _i11.PageInfo(
+    name,
+    builder: (data) {
+      return const _i9.ProjectPage();
+    },
+  );
+}
+
+/// generated route for
+/// [_i10.SplashPage]
+class SplashRoute extends _i11.PageRouteInfo<void> {
+  const SplashRoute({List<_i11.PageRouteInfo>? children})
     : super(SplashRoute.name, initialChildren: children);
 
   static const String name = 'SplashRoute';
 
-  static _i10.PageInfo page = _i10.PageInfo(
+  static _i11.PageInfo page = _i11.PageInfo(
     name,
     builder: (data) {
-      return const _i9.SplashPage();
+      return const _i10.SplashPage();
     },
   );
 }

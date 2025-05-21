@@ -127,10 +127,10 @@ class _GalleryMediaPageState extends ConsumerState<GalleryMediaPage> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            context.pop();
             if (controller.value.isSelecting) {
               context.pop();
             }
+            context.pop();
           },
         ),
         actions: [
@@ -202,6 +202,7 @@ class _GalleryMediaPageState extends ConsumerState<GalleryMediaPage> {
     return Expanded(
       child: DragSelectGridView(
         triggerSelectionOnTap: true,
+        addAutomaticKeepAlives: false,
         gridController: controller,
         itemCount: state.medias.length,
         itemBuilder: (context, index, selected) {
