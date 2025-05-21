@@ -56,8 +56,16 @@ class AppRouter extends RootStackRouter {
             AutoRoute(
               path: 'dashboard',
               page: ProjectDashboardRoute.page,
-              children: [AutoRoute(path: 'diagram', page: ProjectDiagramRoute.page, children: [])],
+              children: [
+                AutoRoute(
+                  path: 'diagram',
+                  page: ProjectDiagramRoute.page,
+
+                  children: [AutoRoute(path: 'view', page: GalleryViewRoute.page, initial: true)],
+                ),
+              ],
             ),
+            AutoRoute(path: 'media', page: GalleryMediaRoute.page),
           ],
         ),
       ],

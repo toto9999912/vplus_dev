@@ -16,25 +16,25 @@ import 'package:vplus_dev/feature/about_me/presentation/pages/about_me_dashboard
 import 'package:vplus_dev/feature/about_me/presentation/pages/about_me_page.dart'
     as _i2;
 import 'package:vplus_dev/feature/auth/presentation/pages/login_page.dart'
-    as _i8;
+    as _i9;
 import 'package:vplus_dev/feature/gallery/domain/entities/gallery_media.dart'
     as _i15;
 import 'package:vplus_dev/feature/gallery/domain/enums/media_action.dart'
     as _i16;
 import 'package:vplus_dev/feature/gallery/presentation/pages/gallery_editor_page.dart'
-    as _i3;
-import 'package:vplus_dev/feature/gallery/presentation/pages/gallery_instagram_page.dart'
-    as _i5;
-import 'package:vplus_dev/feature/gallery/presentation/pages/gallery_media_page.dart'
-    as _i6;
-import 'package:vplus_dev/feature/gallery/presentation/pages/gallery_page.dart'
     as _i4;
-import 'package:vplus_dev/feature/home/presentation/pages/home_page.dart'
+import 'package:vplus_dev/feature/gallery/presentation/pages/gallery_instagram_page.dart'
+    as _i6;
+import 'package:vplus_dev/feature/gallery/presentation/pages/gallery_media_page.dart'
     as _i7;
+import 'package:vplus_dev/feature/gallery/presentation/pages/gallery_page.dart'
+    as _i5;
+import 'package:vplus_dev/feature/home/presentation/pages/home_page.dart'
+    as _i8;
 import 'package:vplus_dev/feature/project/presentation/pages/project_dashboard_page.dart'
-    as _i9;
-import 'package:vplus_dev/feature/project/presentation/pages/project_diagram_page.dart'
     as _i10;
+import 'package:vplus_dev/feature/project/presentation/pages/project_diagram_page.dart'
+    as _i3;
 import 'package:vplus_dev/feature/project/presentation/pages/project_page.dart'
     as _i11;
 import 'package:vplus_dev/feature/splash/presentation/pages/splash_page.dart'
@@ -73,7 +73,23 @@ class AboutMeRoute extends _i13.PageRouteInfo<void> {
 }
 
 /// generated route for
-/// [_i3.GalleryEditorPage]
+/// [_i3.DiagramViewScreen]
+class DiagramViewRoute extends _i13.PageRouteInfo<void> {
+  const DiagramViewRoute({List<_i13.PageRouteInfo>? children})
+    : super(DiagramViewRoute.name, initialChildren: children);
+
+  static const String name = 'DiagramViewRoute';
+
+  static _i13.PageInfo page = _i13.PageInfo(
+    name,
+    builder: (data) {
+      return const _i3.DiagramViewScreen();
+    },
+  );
+}
+
+/// generated route for
+/// [_i4.GalleryEditorPage]
 class GalleryEditorRoute extends _i13.PageRouteInfo<GalleryEditorRouteArgs> {
   GalleryEditorRoute({
     _i14.Key? key,
@@ -96,7 +112,7 @@ class GalleryEditorRoute extends _i13.PageRouteInfo<GalleryEditorRouteArgs> {
     name,
     builder: (data) {
       final args = data.argsAs<GalleryEditorRouteArgs>();
-      return _i3.GalleryEditorPage(
+      return _i4.GalleryEditorPage(
         key: args.key,
         media: args.media,
         initialTab: args.initialTab,
@@ -125,7 +141,7 @@ class GalleryEditorRouteArgs {
 }
 
 /// generated route for
-/// [_i4.GalleryHeaderPage]
+/// [_i5.GalleryHeaderPage]
 class GalleryHeaderRoute extends _i13.PageRouteInfo<void> {
   const GalleryHeaderRoute({List<_i13.PageRouteInfo>? children})
     : super(GalleryHeaderRoute.name, initialChildren: children);
@@ -135,13 +151,13 @@ class GalleryHeaderRoute extends _i13.PageRouteInfo<void> {
   static _i13.PageInfo page = _i13.PageInfo(
     name,
     builder: (data) {
-      return const _i4.GalleryHeaderPage();
+      return const _i5.GalleryHeaderPage();
     },
   );
 }
 
 /// generated route for
-/// [_i5.GalleryInstagramPage]
+/// [_i6.GalleryInstagramPage]
 class GalleryInstagramRoute
     extends _i13.PageRouteInfo<GalleryInstagramRouteArgs> {
   GalleryInstagramRoute({
@@ -162,7 +178,7 @@ class GalleryInstagramRoute
       final args = data.argsAs<GalleryInstagramRouteArgs>(
         orElse: () => const GalleryInstagramRouteArgs(),
       );
-      return _i5.GalleryInstagramPage(
+      return _i6.GalleryInstagramPage(
         initialIndex: args.initialIndex,
         key: args.key,
       );
@@ -184,7 +200,7 @@ class GalleryInstagramRouteArgs {
 }
 
 /// generated route for
-/// [_i6.GalleryMediaPage]
+/// [_i7.GalleryMediaPage]
 class GalleryMediaRoute extends _i13.PageRouteInfo<void> {
   const GalleryMediaRoute({List<_i13.PageRouteInfo>? children})
     : super(GalleryMediaRoute.name, initialChildren: children);
@@ -194,13 +210,13 @@ class GalleryMediaRoute extends _i13.PageRouteInfo<void> {
   static _i13.PageInfo page = _i13.PageInfo(
     name,
     builder: (data) {
-      return const _i6.GalleryMediaPage();
+      return const _i7.GalleryMediaPage();
     },
   );
 }
 
 /// generated route for
-/// [_i4.GalleryPage]
+/// [_i5.GalleryPage]
 class GalleryRoute extends _i13.PageRouteInfo<void> {
   const GalleryRoute({List<_i13.PageRouteInfo>? children})
     : super(GalleryRoute.name, initialChildren: children);
@@ -210,13 +226,13 @@ class GalleryRoute extends _i13.PageRouteInfo<void> {
   static _i13.PageInfo page = _i13.PageInfo(
     name,
     builder: (data) {
-      return const _i4.GalleryPage();
+      return const _i5.GalleryPage();
     },
   );
 }
 
 /// generated route for
-/// [_i4.GalleryViewScreen]
+/// [_i5.GalleryViewScreen]
 class GalleryViewRoute extends _i13.PageRouteInfo<void> {
   const GalleryViewRoute({List<_i13.PageRouteInfo>? children})
     : super(GalleryViewRoute.name, initialChildren: children);
@@ -226,13 +242,13 @@ class GalleryViewRoute extends _i13.PageRouteInfo<void> {
   static _i13.PageInfo page = _i13.PageInfo(
     name,
     builder: (data) {
-      return const _i4.GalleryViewScreen();
+      return const _i5.GalleryViewScreen();
     },
   );
 }
 
 /// generated route for
-/// [_i4.GalleryWrapperScreen]
+/// [_i5.GalleryWrapperScreen]
 class GalleryWrapperRoute extends _i13.PageRouteInfo<void> {
   const GalleryWrapperRoute({List<_i13.PageRouteInfo>? children})
     : super(GalleryWrapperRoute.name, initialChildren: children);
@@ -242,13 +258,13 @@ class GalleryWrapperRoute extends _i13.PageRouteInfo<void> {
   static _i13.PageInfo page = _i13.PageInfo(
     name,
     builder: (data) {
-      return const _i4.GalleryWrapperScreen();
+      return const _i5.GalleryWrapperScreen();
     },
   );
 }
 
 /// generated route for
-/// [_i7.HomePage]
+/// [_i8.HomePage]
 class HomeRoute extends _i13.PageRouteInfo<void> {
   const HomeRoute({List<_i13.PageRouteInfo>? children})
     : super(HomeRoute.name, initialChildren: children);
@@ -258,13 +274,13 @@ class HomeRoute extends _i13.PageRouteInfo<void> {
   static _i13.PageInfo page = _i13.PageInfo(
     name,
     builder: (data) {
-      return const _i7.HomePage();
+      return const _i8.HomePage();
     },
   );
 }
 
 /// generated route for
-/// [_i8.LoginPage]
+/// [_i9.LoginPage]
 class LoginRoute extends _i13.PageRouteInfo<void> {
   const LoginRoute({List<_i13.PageRouteInfo>? children})
     : super(LoginRoute.name, initialChildren: children);
@@ -274,13 +290,13 @@ class LoginRoute extends _i13.PageRouteInfo<void> {
   static _i13.PageInfo page = _i13.PageInfo(
     name,
     builder: (data) {
-      return const _i8.LoginPage();
+      return const _i9.LoginPage();
     },
   );
 }
 
 /// generated route for
-/// [_i9.ProjectDashboardPage]
+/// [_i10.ProjectDashboardPage]
 class ProjectDashboardRoute extends _i13.PageRouteInfo<void> {
   const ProjectDashboardRoute({List<_i13.PageRouteInfo>? children})
     : super(ProjectDashboardRoute.name, initialChildren: children);
@@ -290,13 +306,13 @@ class ProjectDashboardRoute extends _i13.PageRouteInfo<void> {
   static _i13.PageInfo page = _i13.PageInfo(
     name,
     builder: (data) {
-      return const _i9.ProjectDashboardPage();
+      return const _i10.ProjectDashboardPage();
     },
   );
 }
 
 /// generated route for
-/// [_i10.ProjectDiagramPage]
+/// [_i3.ProjectDiagramPage]
 class ProjectDiagramRoute extends _i13.PageRouteInfo<void> {
   const ProjectDiagramRoute({List<_i13.PageRouteInfo>? children})
     : super(ProjectDiagramRoute.name, initialChildren: children);
@@ -306,7 +322,7 @@ class ProjectDiagramRoute extends _i13.PageRouteInfo<void> {
   static _i13.PageInfo page = _i13.PageInfo(
     name,
     builder: (data) {
-      return const _i10.ProjectDiagramPage();
+      return const _i3.ProjectDiagramPage();
     },
   );
 }
