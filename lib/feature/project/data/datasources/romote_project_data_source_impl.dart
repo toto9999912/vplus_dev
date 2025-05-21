@@ -3,9 +3,9 @@ import 'package:vplus_dev/core/network/api_client.dart';
 import '../dtos/project_dto.dart';
 import 'project_data_source.dart';
 
-class RomoteProjectDataSourceImpl implements PorjectDataSource {
+class RemoteProjectDataSourceImpl implements ProjectDataSource {
   final ApiClient client;
-  RomoteProjectDataSourceImpl(this.client);
+  RemoteProjectDataSourceImpl(this.client);
   @override
   Future<List<ProjectDto>> getProjectList() async {
     final response = await client.get(

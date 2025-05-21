@@ -4,7 +4,7 @@ import '../datasources/project_data_source.dart';
 import 'project_repository.dart';
 
 class ProjectRepositoryImpl implements ProjectRepository {
-  final PorjectDataSource _dataSource;
+  final ProjectDataSource _dataSource;
 
   ProjectRepositoryImpl(this._dataSource);
   @override

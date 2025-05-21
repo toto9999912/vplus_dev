@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 import '../../domain/entities/project.dart';
-import '../../domain/enums/status.dart';
+import '../../domain/enums/project_status.dart';
 import 'project_role_dto.dart';
 
 part 'project_dto.freezed.dart';

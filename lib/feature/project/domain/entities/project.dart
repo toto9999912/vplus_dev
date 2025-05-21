@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-import '../enums/status.dart';
+import '../enums/project_status.dart';
 
 part 'project.freezed.dart';
 
