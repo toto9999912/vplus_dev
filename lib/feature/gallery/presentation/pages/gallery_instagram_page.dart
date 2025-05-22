@@ -109,11 +109,11 @@ class _GalleryInstagramPageState extends ConsumerState<GalleryInstagramPage> {
         break;
       case MediaAction.classify:
         // 直接使用 MediaAction.classify 作為初始標籤
-        context.router.push(GalleryEditorRoute(media: media, initialTab: MediaAction.classify));
+        // context.router.push(GalleryEditorRoute(media: media, initialTab: MediaAction.classify));
         break;
       case MediaAction.note:
         // 直接使用 MediaAction.note 作為初始標籤
-        context.router.push(GalleryEditorRoute(media: media, initialTab: MediaAction.note));
+        // context.router.push(GalleryEditorRoute(media: media, initialTab: MediaAction.note));
         break;
       case MediaAction.share:
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('分享功能即將推出')));

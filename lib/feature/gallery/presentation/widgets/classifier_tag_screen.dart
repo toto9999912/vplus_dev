@@ -13,8 +13,9 @@ import 'snackbar_listener.dart';
 
 class ClassifierTagScreen extends ConsumerStatefulWidget {
   final int classifierId;
+  final int? projectId;
   final AccessMode accessMode;
-  const ClassifierTagScreen({required this.classifierId, required this.accessMode, super.key});
+  const ClassifierTagScreen({required this.classifierId, required this.accessMode, this.projectId, super.key});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => _ClassifierTagScreenState();
@@ -28,7 +29,7 @@ class _ClassifierTagScreenState extends ConsumerState<ClassifierTagScreen> {
   @override
   Widget build(BuildContext context) {
     final ItemScrollController itemScrollController = ItemScrollController();
-    final classifierAsync = ref.watch(classifierTagNotifierProvider(widget.classifierId));
+    final classifierAsync = ref.watch(classifierTagNotifierProvider(widget.classifierId, widget.projectId));
 
     return classifierAsync.when(
       data:
@@ -91,7 +92,12 @@ class _ClassifierTagScreenState extends ConsumerState<ClassifierTagScreen> {
           return Column(
             children: [
               Padding(padding: const EdgeInsets.only(bottom: 8), child: Text(subClassifier.titleZhTw, style: const TextStyle(fontSize: 12))),
-              TagCategroyView(categories: subClassifier.categories!, subClassifierIndex: subClassifierIndex, classifierId: widget.classifierId),
+              TagCategroyView(
+                projectId: widget.projectId,
+                categories: subClassifier.categories!,
+                subClassifierIndex: subClassifierIndex,
+                classifierId: widget.classifierId,
+              ),
             ],
           );
         },

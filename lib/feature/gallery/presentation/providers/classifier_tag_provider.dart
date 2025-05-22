@@ -1,4 +1,5 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:vplus_dev/feature/project/presentation/providers/diagram_providers.dart';
 
 import '../../data/dtos/tag_request_dto.dart';
 import '../../data/dtos/reorder_request_dto.dart';
@@ -13,15 +14,21 @@ part 'classifier_tag_provider.g.dart';
 @riverpod
 class ClassifierTagNotifier extends _$ClassifierTagNotifier {
   @override
-  FutureOr<Classifier> build(int classifierId) async {
-    return getClassifier(classifierId);
+  FutureOr<Classifier> build(int classifierId, int? projectId) async {
+    return getClassifier(classifierId, projectId);
   }
 
   // 初始加載 classifier 數據
-  Future<Classifier> getClassifier(int classifierId) {
-    final useCase = ref.watch(getClassifierTagUseCaseProvider);
-    final classifier = useCase.execute(classifierId);
-    return classifier;
+  Future<Classifier> getClassifier(int classifierId, int? projectId) {
+    if (projectId != null) {
+      final useCase = ref.watch(getProjectClassifierTagUseCaseProvider);
+      final classifier = useCase.execute(classifierId, projectId);
+      return classifier;
+    } else {
+      final useCase = ref.watch(getClassifierTagUseCaseProvider);
+      final classifier = useCase.execute(classifierId);
+      return classifier;
+    }
   }
 
   // 重新排序分類目錄

@@ -10,7 +10,6 @@ class ProjectRepositoryImpl implements ProjectRepository {
   @override
   Future<List<Project>> getProjectList() async {
     final dtos = await _dataSource.getProjectList();
-
     return dtos.map((dto) => dto.toDomain()).toList();
   }
 }

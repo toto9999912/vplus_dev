@@ -3,7 +3,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:vplus_dev/core/providers/api_client_providers.dart';
 import 'package:vplus_dev/feature/project/domain/entities/project.dart';
 import 'package:vplus_dev/feature/project/domain/enums/project_status.dart';
-import 'package:vplus_dev/feature/project/domain/usecases/group_projects_usecase.dart';
+import 'package:vplus_dev/feature/project/domain/usecases/get_group_projects_usecase.dart';
 
 import '../../data/datasources/project_data_source.dart';
 import '../../data/datasources/remote_project_data_source_impl.dart';

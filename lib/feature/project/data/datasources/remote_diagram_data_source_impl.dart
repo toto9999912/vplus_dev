@@ -3,10 +3,10 @@ import 'package:vplus_dev/feature/gallery/data/dtos/gallery_classifier_dto.dart'
 
 import 'diagram_data_source.dart';
 
-class RemoteDiagramDataSource implements DiagramDataSource {
+class RemoteDiagramDataSourceImpl implements DiagramDataSource {
   final ApiClient client;
 
-  RemoteDiagramDataSource(this.client);
+  RemoteDiagramDataSourceImpl(this.client);
 
   @override
   Future<List<ClassifierDto>> getDiagram() async {

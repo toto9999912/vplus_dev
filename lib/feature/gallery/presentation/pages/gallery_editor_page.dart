@@ -12,10 +12,11 @@ import '../widgets/media_classifier_tag_screen.dart';
 
 @RoutePage()
 class GalleryEditorPage extends ConsumerStatefulWidget {
+  final int projectId;
   final GalleryMedia media;
   final MediaAction initialTab;
 
-  const GalleryEditorPage({super.key, required this.media, required this.initialTab});
+  const GalleryEditorPage({super.key, required this.projectId, required this.media, required this.initialTab});
 
   @override
   ConsumerState<GalleryEditorPage> createState() => _GalleryEditorPageState();
@@ -84,7 +85,7 @@ class _GalleryEditorPageState extends ConsumerState<GalleryEditorPage> with Sing
                           : const Icon(Icons.perm_media, size: 100),
                 ),
               ),
-              Expanded(child: ClassifyMediaScreen(media: widget.media)),
+              Expanded(child: ClassifyMediaScreen(projectId: widget.projectId, media: widget.media)),
             ],
           ),
           _buildNoteTab(),
@@ -135,9 +136,10 @@ class _GalleryEditorPageState extends ConsumerState<GalleryEditorPage> with Sing
 }
 
 class ClassifyMediaScreen extends ConsumerWidget {
+  final int projectId;
   final GalleryMedia media;
 
-  const ClassifyMediaScreen({required this.media, super.key});
+  const ClassifyMediaScreen({required this.projectId, required this.media, super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -158,7 +160,7 @@ class ClassifyMediaScreen extends ConsumerWidget {
                 child: TabBarView(
                   children:
                       galleryType.classifiers.map((classifier) {
-                        return MediaClassifierTagScreen(classifierId: classifier.id, media: media);
+                        return MediaClassifierTagScreen(projectId: projectId, classifierId: classifier.id, media: media);
                       }).toList(),
                 ),
               ),

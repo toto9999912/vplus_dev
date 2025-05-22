@@ -11,10 +11,11 @@ import 'media_editor_tag_section.dart';
 
 /// 媒體編輯器專用的分類標籤界面
 class MediaClassifierTagScreen extends ConsumerStatefulWidget {
+  final int? projectId;
   final int classifierId;
   final GalleryMedia media;
 
-  const MediaClassifierTagScreen({required this.classifierId, required this.media, super.key});
+  const MediaClassifierTagScreen({required this.projectId, required this.classifierId, required this.media, super.key});
 
   @override
   ConsumerState<MediaClassifierTagScreen> createState() => _MediaClassifierTagScreenState();
@@ -28,7 +29,7 @@ class _MediaClassifierTagScreenState extends ConsumerState<MediaClassifierTagScr
   @override
   Widget build(BuildContext context) {
     final ItemScrollController itemScrollController = ItemScrollController();
-    final classifierAsync = ref.watch(classifierTagNotifierProvider(widget.classifierId));
+    final classifierAsync = ref.watch(classifierTagNotifierProvider(widget.classifierId, widget.projectId));
 
     return classifierAsync.when(
       data:

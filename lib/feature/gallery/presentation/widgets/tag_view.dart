@@ -23,11 +23,19 @@ final defaultColors = [
 ];
 
 class TagView extends ConsumerWidget {
+  final int? projectId;
   final int classifierId;
   final int subClassifierIndex;
   final int categoryIndex;
   final TagCategory category;
-  const TagView({required this.classifierId, required this.subClassifierIndex, required this.categoryIndex, required this.category, super.key});
+  const TagView({
+    required this.projectId,
+    required this.classifierId,
+    required this.subClassifierIndex,
+    required this.categoryIndex,
+    required this.category,
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -41,7 +49,7 @@ class TagView extends ConsumerWidget {
       crossAxisCount: 4,
       childAspectRatio: 2,
       onReorder: (int oldIndex, int newIndex) {
-        ref.read(classifierTagNotifierProvider(classifierId).notifier).reorderTags(subClassifierIndex, categoryIndex, oldIndex, newIndex);
+        ref.read(classifierTagNotifierProvider(classifierId, projectId).notifier).reorderTags(subClassifierIndex, categoryIndex, oldIndex, newIndex);
       },
       footer: [AppButton.outline(child: const Icon(Icons.add), onPressed: () => _handleAddTag(context, ref))],
       children:
@@ -111,7 +119,9 @@ class TagView extends ConsumerWidget {
 
     if (result == null) return;
 
-    ref.read(classifierTagNotifierProvider(classifierId).notifier).createTag(subClassifierIndex, categoryIndex, formData.title, formData.color);
+    ref
+        .read(classifierTagNotifierProvider(classifierId, projectId).notifier)
+        .createTag(subClassifierIndex, categoryIndex, formData.title, formData.color);
   }
 
   // 處理編輯標籤
@@ -130,7 +140,7 @@ class TagView extends ConsumerWidget {
                 title: '確定刪除標籤？',
                 desc: '刪除後無法恢復，請確認是否刪除',
                 onOkPress: () {
-                  ref.read(classifierTagNotifierProvider(classifierId).notifier).deleteTag(subClassifierIndex, categoryIndex, tag.id);
+                  ref.read(classifierTagNotifierProvider(classifierId, projectId).notifier).deleteTag(subClassifierIndex, categoryIndex, tag.id);
                   Navigator.of(context, rootNavigator: true).pop();
                 },
                 onCancelPress: () {},
@@ -152,6 +162,8 @@ class TagView extends ConsumerWidget {
 
     if (result == null) return;
 
-    ref.read(classifierTagNotifierProvider(classifierId).notifier).editTag(subClassifierIndex, categoryIndex, tag.id, formData.title, formData.color);
+    ref
+        .read(classifierTagNotifierProvider(classifierId, projectId).notifier)
+        .editTag(subClassifierIndex, categoryIndex, tag.id, formData.title, formData.color);
   }
 }

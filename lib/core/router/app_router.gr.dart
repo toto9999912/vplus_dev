@@ -93,6 +93,7 @@ class DiagramViewRoute extends _i13.PageRouteInfo<void> {
 class GalleryEditorRoute extends _i13.PageRouteInfo<GalleryEditorRouteArgs> {
   GalleryEditorRoute({
     _i14.Key? key,
+    required int projectId,
     required _i15.GalleryMedia media,
     required _i16.MediaAction initialTab,
     List<_i13.PageRouteInfo>? children,
@@ -100,6 +101,7 @@ class GalleryEditorRoute extends _i13.PageRouteInfo<GalleryEditorRouteArgs> {
          GalleryEditorRoute.name,
          args: GalleryEditorRouteArgs(
            key: key,
+           projectId: projectId,
            media: media,
            initialTab: initialTab,
          ),
@@ -114,6 +116,7 @@ class GalleryEditorRoute extends _i13.PageRouteInfo<GalleryEditorRouteArgs> {
       final args = data.argsAs<GalleryEditorRouteArgs>();
       return _i4.GalleryEditorPage(
         key: args.key,
+        projectId: args.projectId,
         media: args.media,
         initialTab: args.initialTab,
       );
@@ -124,11 +127,14 @@ class GalleryEditorRoute extends _i13.PageRouteInfo<GalleryEditorRouteArgs> {
 class GalleryEditorRouteArgs {
   const GalleryEditorRouteArgs({
     this.key,
+    required this.projectId,
     required this.media,
     required this.initialTab,
   });
 
   final _i14.Key? key;
+
+  final int projectId;
 
   final _i15.GalleryMedia media;
 
@@ -136,7 +142,7 @@ class GalleryEditorRouteArgs {
 
   @override
   String toString() {
-    return 'GalleryEditorRouteArgs{key: $key, media: $media, initialTab: $initialTab}';
+    return 'GalleryEditorRouteArgs{key: $key, projectId: $projectId, media: $media, initialTab: $initialTab}';
   }
 }
 

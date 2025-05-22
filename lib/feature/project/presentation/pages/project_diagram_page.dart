@@ -6,6 +6,8 @@ import 'package:vplus_dev/feature/gallery/presentation/widgets/classifier_tag_sc
 import 'package:vplus_dev/feature/gallery/presentation/widgets/galley_tabbar.dart';
 import 'package:vplus_dev/shared/enum/access_mode.dart';
 
+import '../providers/diagram_providers.dart';
+
 @RoutePage()
 class ProjectDiagramPage extends StatelessWidget {
   const ProjectDiagramPage({super.key});
@@ -22,7 +24,7 @@ class DiagramViewScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final activeGalleryTypeAsync = ref.watch(selectedGalleryTypeProvider);
+    final activeGalleryTypeAsync = ref.watch(diagramGalleryTypeProvider);
     return activeGalleryTypeAsync.when(
       data: (galleryType) {
         return DefaultTabController(
@@ -39,7 +41,7 @@ class DiagramViewScreen extends ConsumerWidget {
                 child: TabBarView(
                   children:
                       galleryType.classifiers.map((classifier) {
-                        return ClassifierTagScreen(accessMode: AccessMode.readWrite, classifierId: classifier.id);
+                        return ClassifierTagScreen(accessMode: AccessMode.readWrite, classifierId: classifier.id, projectId: 4);
                       }).toList(),
                 ),
               ),

@@ -7,9 +7,10 @@ import 'tag_view.dart';
 
 class TagCategroyView extends ConsumerWidget {
   final List<TagCategory> categories;
+  final int? projectId;
   final int subClassifierIndex;
   final int classifierId;
-  const TagCategroyView({required this.categories, required this.subClassifierIndex, required this.classifierId, super.key});
+  const TagCategroyView({required this.categories, required this.projectId, required this.subClassifierIndex, required this.classifierId, super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -38,7 +39,13 @@ class TagCategroyView extends ConsumerWidget {
                     (context, isExpanded) => ListTile(
                       title: Text("${categoryIndex + 1}. ${category.title}", strutStyle: const StrutStyle(forceStrutHeight: true, leading: 0.5)),
                     ),
-                body: TagView(classifierId: classifierId, subClassifierIndex: subClassifierIndex, categoryIndex: categoryIndex, category: category),
+                body: TagView(
+                  projectId: projectId,
+                  classifierId: classifierId,
+                  subClassifierIndex: subClassifierIndex,
+                  categoryIndex: categoryIndex,
+                  category: category,
+                ),
               ),
             ],
           ),
@@ -46,7 +53,7 @@ class TagCategroyView extends ConsumerWidget {
       },
       itemCount: categories.length,
       onReorder: (oldIndex, newIndex) {
-        ref.read(classifierTagNotifierProvider(classifierId).notifier).reorderCategories(subClassifierIndex, oldIndex, newIndex);
+        ref.read(classifierTagNotifierProvider(classifierId, projectId).notifier).reorderCategories(subClassifierIndex, oldIndex, newIndex);
       },
     );
   }

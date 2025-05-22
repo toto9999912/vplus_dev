@@ -61,7 +61,7 @@ class AppRouter extends RootStackRouter {
                   path: 'diagram',
                   page: ProjectDiagramRoute.page,
 
-                  children: [AutoRoute(path: 'view', page: GalleryViewRoute.page, initial: true)],
+                  children: [AutoRoute(path: 'view', page: DiagramViewRoute.page, initial: true)],
                 ),
               ],
             ),

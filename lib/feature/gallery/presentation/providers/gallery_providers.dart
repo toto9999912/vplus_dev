@@ -77,8 +77,8 @@ GetClassifierTagUseCase getClassifierTagUseCase(Ref ref) {
 /// 提供 Gallery 類型列表數據
 @riverpod
 Future<List<GalleryType>> galleryTypes(Ref ref) async {
-  final useCase = ref.watch(getGalleryTypesUseCaseProvider);
-  return await useCase.execute();
+  final usecase = ref.watch(getGalleryTypesUseCaseProvider);
+  return await usecase.execute();
 }
 
 /// 當前選中的 Gallery 類型索引
