@@ -74,18 +74,40 @@ class AboutMeRoute extends _i13.PageRouteInfo<void> {
 
 /// generated route for
 /// [_i3.DiagramViewScreen]
-class DiagramViewRoute extends _i13.PageRouteInfo<void> {
-  const DiagramViewRoute({List<_i13.PageRouteInfo>? children})
-    : super(DiagramViewRoute.name, initialChildren: children);
+class DiagramViewRoute extends _i13.PageRouteInfo<DiagramViewRouteArgs> {
+  DiagramViewRoute({_i14.Key? key, List<_i13.PageRouteInfo>? children})
+    : super(
+        DiagramViewRoute.name,
+        args: DiagramViewRouteArgs(key: key),
+        initialChildren: children,
+      );
 
   static const String name = 'DiagramViewRoute';
 
   static _i13.PageInfo page = _i13.PageInfo(
     name,
     builder: (data) {
-      return const _i3.DiagramViewScreen();
+      final pathParams = data.inheritedPathParams;
+      final args = data.argsAs<DiagramViewRouteArgs>(
+        orElse: () => DiagramViewRouteArgs(),
+      );
+      return _i3.DiagramViewScreen(
+        key: args.key,
+        projectId: pathParams.getInt('projectId'),
+      );
     },
   );
+}
+
+class DiagramViewRouteArgs {
+  const DiagramViewRouteArgs({this.key});
+
+  final _i14.Key? key;
+
+  @override
+  String toString() {
+    return 'DiagramViewRouteArgs{key: $key}';
+  }
 }
 
 /// generated route for
@@ -303,34 +325,84 @@ class LoginRoute extends _i13.PageRouteInfo<void> {
 
 /// generated route for
 /// [_i10.ProjectDashboardPage]
-class ProjectDashboardRoute extends _i13.PageRouteInfo<void> {
-  const ProjectDashboardRoute({List<_i13.PageRouteInfo>? children})
-    : super(ProjectDashboardRoute.name, initialChildren: children);
+class ProjectDashboardRoute
+    extends _i13.PageRouteInfo<ProjectDashboardRouteArgs> {
+  ProjectDashboardRoute({
+    required int projectId,
+    _i14.Key? key,
+    List<_i13.PageRouteInfo>? children,
+  }) : super(
+         ProjectDashboardRoute.name,
+         args: ProjectDashboardRouteArgs(projectId: projectId, key: key),
+         initialChildren: children,
+       );
 
   static const String name = 'ProjectDashboardRoute';
 
   static _i13.PageInfo page = _i13.PageInfo(
     name,
     builder: (data) {
-      return const _i10.ProjectDashboardPage();
+      final args = data.argsAs<ProjectDashboardRouteArgs>();
+      return _i10.ProjectDashboardPage(args.projectId, key: args.key);
     },
   );
 }
 
+class ProjectDashboardRouteArgs {
+  const ProjectDashboardRouteArgs({required this.projectId, this.key});
+
+  final int projectId;
+
+  final _i14.Key? key;
+
+  @override
+  String toString() {
+    return 'ProjectDashboardRouteArgs{projectId: $projectId, key: $key}';
+  }
+}
+
 /// generated route for
 /// [_i3.ProjectDiagramPage]
-class ProjectDiagramRoute extends _i13.PageRouteInfo<void> {
-  const ProjectDiagramRoute({List<_i13.PageRouteInfo>? children})
-    : super(ProjectDiagramRoute.name, initialChildren: children);
+class ProjectDiagramRoute extends _i13.PageRouteInfo<ProjectDiagramRouteArgs> {
+  ProjectDiagramRoute({
+    _i14.Key? key,
+    required int projectId,
+    List<_i13.PageRouteInfo>? children,
+  }) : super(
+         ProjectDiagramRoute.name,
+         args: ProjectDiagramRouteArgs(key: key, projectId: projectId),
+         rawPathParams: {'projectId': projectId},
+         initialChildren: children,
+       );
 
   static const String name = 'ProjectDiagramRoute';
 
   static _i13.PageInfo page = _i13.PageInfo(
     name,
     builder: (data) {
-      return const _i3.ProjectDiagramPage();
+      final pathParams = data.inheritedPathParams;
+      final args = data.argsAs<ProjectDiagramRouteArgs>(
+        orElse:
+            () => ProjectDiagramRouteArgs(
+              projectId: pathParams.getInt('projectId'),
+            ),
+      );
+      return _i3.ProjectDiagramPage(key: args.key, projectId: args.projectId);
     },
   );
+}
+
+class ProjectDiagramRouteArgs {
+  const ProjectDiagramRouteArgs({this.key, required this.projectId});
+
+  final _i14.Key? key;
+
+  final int projectId;
+
+  @override
+  String toString() {
+    return 'ProjectDiagramRouteArgs{key: $key, projectId: $projectId}';
+  }
 }
 
 /// generated route for

@@ -40,28 +40,21 @@ class ProjectListPage extends ConsumerWidget {
               },
             );
           }
-          return _buildProjectListView(groupedProjects);
+          return _buildProjectListView(context, groupedProjects);
         },
         error: (error, stackTrace) => Center(child: Text('發生錯誤: $error')),
         loading: () => const Center(child: CircularProgressIndicator()),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          context.pushRoute(ProjectDashboardRoute());
-          // TODO: 實現新增專案功能
-        },
-        tooltip: '新增專案',
-        child: const Icon(Icons.add),
-      ),
+      floatingActionButton: FloatingActionButton(onPressed: () {}, tooltip: '新增專案', child: const Icon(Icons.add)),
     );
   }
 
-  Widget _buildProjectListView(Map<ProjectStatus, List<Project>> groupedProjects) {
+  Widget _buildProjectListView(BuildContext context, Map<ProjectStatus, List<Project>> groupedProjects) {
     // 準備拖放列表
     final lists = <DragAndDropList>[];
 
     groupedProjects.forEach((status, projects) {
-      lists.add(_buildProjectSection(status, projects));
+      lists.add(_buildProjectSection(context, status, projects));
     });
 
     return DragAndDropLists(
@@ -75,7 +68,7 @@ class ProjectListPage extends ConsumerWidget {
     );
   }
 
-  DragAndDropList _buildProjectSection(ProjectStatus status, List<Project> projects) {
+  DragAndDropList _buildProjectSection(BuildContext context, ProjectStatus status, List<Project> projects) {
     return DragAndDropList(
       header: Padding(
         padding: const EdgeInsets.all(12),
@@ -95,31 +88,37 @@ class ProjectListPage extends ConsumerWidget {
           projects.asMap().entries.map((entry) {
             final index = entry.key;
             final project = entry.value;
-            return _buildProjectItem(project, index);
+            return _buildProjectItem(context, project, index);
           }).toList(),
       canDrag: false,
     );
   }
 
-  DragAndDropItem _buildProjectItem(Project project, int index) {
+  DragAndDropItem _buildProjectItem(BuildContext context, Project project, int index) {
     return DragAndDropItem(
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-        decoration: BoxDecoration(border: Border(bottom: BorderSide(color: AppColors.grey07))),
-        child: Row(
-          children: [
-            // 顯示索引
-            Container(
-              width: 24,
-              height: 24,
-              margin: const EdgeInsets.only(right: 12),
+      child: InkWell(
+        onTap: () {
+          // 導航到 ProjectDashboardPage，傳入專案 ID
+          context.pushRoute(ProjectDashboardRoute(projectId: project.id));
+        },
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+          decoration: BoxDecoration(border: Border(bottom: BorderSide(color: AppColors.grey07))),
+          child: Row(
+            children: [
+              // 顯示索引
+              Container(
+                width: 24,
+                height: 24,
+                margin: const EdgeInsets.only(right: 12),
 
-              alignment: Alignment.center,
-              child: Text('${index + 1}', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.black54)),
-            ),
-            // 專案名稱
-            Expanded(child: Text(project.projectName)),
-          ],
+                alignment: Alignment.center,
+                child: Text('${index + 1}', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.black54)),
+              ),
+              // 專案名稱
+              Expanded(child: Text(project.projectName)),
+            ],
+          ),
         ),
       ),
     );

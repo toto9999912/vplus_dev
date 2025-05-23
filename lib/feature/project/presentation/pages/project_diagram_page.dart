@@ -10,22 +10,21 @@ import '../providers/diagram_providers.dart';
 
 @RoutePage()
 class ProjectDiagramPage extends StatelessWidget {
-  const ProjectDiagramPage({super.key});
+  final int projectId;
+  const ProjectDiagramPage({super.key, @PathParam('projectId') required this.projectId});
 
   @override
-  Widget build(BuildContext context) {
-    return const AutoRouter();
-  }
+  Widget build(BuildContext context) => const AutoRouter();
 }
 
 @RoutePage()
 class DiagramViewScreen extends ConsumerWidget {
-  const DiagramViewScreen({super.key});
-
+  const DiagramViewScreen({super.key, @PathParam.inherit('projectId') required this.projectId});
+  final int projectId;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final activeGalleryTypeAsync = ref.watch(diagramGalleryTypeProvider);
-    return activeGalleryTypeAsync.when(
+    final diagramGalleryTypeAsync = ref.watch(diagramGalleryTypeProvider);
+    return diagramGalleryTypeAsync.when(
       data: (galleryType) {
         return DefaultTabController(
           length: galleryType.classifiers.length,
@@ -41,7 +40,7 @@ class DiagramViewScreen extends ConsumerWidget {
                 child: TabBarView(
                   children:
                       galleryType.classifiers.map((classifier) {
-                        return ClassifierTagScreen(accessMode: AccessMode.readWrite, classifierId: classifier.id, projectId: 4);
+                        return ClassifierTagScreen(accessMode: AccessMode.readWrite, classifierId: classifier.id, projectId: projectId);
                       }).toList(),
                 ),
               ),

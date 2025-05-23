@@ -5,12 +5,13 @@ import 'package:vplus_dev/core/router/app_router.gr.dart';
 
 @RoutePage()
 class ProjectDashboardPage extends ConsumerWidget {
-  const ProjectDashboardPage({super.key});
+  final int projectId;
+  const ProjectDashboardPage(this.projectId, {super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return AutoTabsRouter.tabBar(
-      routes: [ProjectDiagramRoute()],
+      routes: [ProjectDiagramRoute(projectId: projectId)],
       builder: (context, child, tabController) {
         return Scaffold(
           appBar: AppBar(

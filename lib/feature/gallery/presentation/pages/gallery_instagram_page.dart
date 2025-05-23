@@ -2,7 +2,6 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
-import 'package:vplus_dev/core/router/app_router.gr.dart';
 import 'package:vplus_dev/shared/enum/media_type.dart';
 
 import '../../domain/enums/media_action.dart';
