@@ -1,20 +1,13 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:vplus_dev/core/providers/service_providers.dart';
-import 'package:vplus_dev/core/router/app_router.gr.dart';
-import 'package:vplus_dev/feature/upload/enums/media_pick_error.dart';
-import 'package:vplus_dev/feature/upload/enums/upload_type.dart';
-import 'package:vplus_dev/feature/upload/models/media_pick_result.dart';
-import 'package:vplus_dev/feature/upload/providers/upload_progress_provider.dart';
-import 'package:vplus_dev/feature/upload/providers/upload_service_provider.dart';
-import 'package:vplus_dev/shared/enum/access_mode.dart';
-import 'package:vplus_dev/shared/models/bottom_sheet_option.dart';
 
-import '../providers/gallery_media_provider.dart';
+import 'package:vplus_dev/core/router/app_router.gr.dart';
+
+import 'package:vplus_dev/shared/enum/access_mode.dart';
+
 import '../providers/gallery_providers.dart';
-import '../providers/selected_tag_provider.dart';
+
 import '../widgets/classifier_tag_screen.dart';
 import '../widgets/galley_tabbar.dart';
 

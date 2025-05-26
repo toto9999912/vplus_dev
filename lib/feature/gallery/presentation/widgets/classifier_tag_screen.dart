@@ -6,14 +6,14 @@ import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:vplus_dev/core/constants/app_color.dart';
 import 'package:vplus_dev/core/providers/service_providers.dart';
 import 'package:vplus_dev/core/router/app_router.gr.dart';
+import 'package:vplus_dev/feature/upload/enum/upload_type.dart';
+import 'package:vplus_dev/feature/upload/providers/upload_service_provider.dart';
 import 'package:vplus_dev/shared/enum/access_mode.dart';
 import 'package:vplus_dev/shared/models/bottom_sheet_option.dart';
 
 import '../../domain/entities/gallery_classifier.dart';
 import '../providers/classifier_tag_provider.dart';
-import '../providers/gallery_media_provider.dart';
-import '../providers/gallery_providers.dart';
-import '../providers/selected_tag_provider.dart';
+
 import 'selected_tag_section.dart';
 import 'tag_categroy_view.dart';
 import 'snackbar_listener.dart';
@@ -33,136 +33,122 @@ class _ClassifierTagScreenState extends ConsumerState<ClassifierTagScreen> {
     controller.scrollTo(index: index, duration: const Duration(milliseconds: 100));
   }
 
-  // 使用範例
-  Future<void> showOptionsExample(WidgetRef ref) async {
-    final uploadService = ref.read(uploadServiceProvider);
+  /// 顯示上傳選項底部彈窗
+  Future<void> showUploadOptions() async {
     final result = await ref
         .read(dialogServiceProvider)
         .showGridBottomSheet<UploadType>(
-          title: '選項',
+          title: '選擇上傳方式',
           options: [
-            BottomSheetOption(title: '拍攝', icon: Icons.camera_alt, value: UploadType.camera),
-            BottomSheetOption(title: '圖片', icon: Icons.image_rounded, value: UploadType.image),
-            BottomSheetOption(title: '影片', icon: Icons.play_circle_rounded, value: UploadType.video),
-            BottomSheetOption(title: '檔案', icon: Icons.folder, value: UploadType.file),
-            BottomSheetOption(title: '連結', icon: Icons.link, value: UploadType.link),
-            BottomSheetOption(title: '文字檔', icon: Icons.text_fields, value: UploadType.text),
-            BottomSheetOption(title: 'Ai圖像分類', icon: FontAwesomeIcons.lightbulb, value: UploadType.ai),
+            BottomSheetOption(title: UploadType.camera.label, icon: Icons.camera_alt, value: UploadType.camera),
+            BottomSheetOption(title: UploadType.image.label, icon: Icons.image_rounded, value: UploadType.image),
+            BottomSheetOption(title: UploadType.video.label, icon: Icons.play_circle_rounded, value: UploadType.video),
+            BottomSheetOption(title: UploadType.file.label, icon: Icons.folder, value: UploadType.file),
+            BottomSheetOption(title: UploadType.link.label, icon: Icons.link, value: UploadType.link),
+            BottomSheetOption(title: UploadType.text.label, icon: Icons.text_fields, value: UploadType.text),
+            BottomSheetOption(title: UploadType.ai.label, icon: FontAwesomeIcons.lightbulb, value: UploadType.ai),
           ],
         );
 
     if (result != null) {
-      // 處理用戶選擇
-      print('用戶選擇了: $result');
+      await _handleUploadType(result);
+    }
+  }
 
-      // 根據選擇執行不同操作
-      switch (result) {
-        case UploadType.camera:
-          final cameraResult = await uploadService.pickImageFromCamera(maxWidth: 1080, maxHeight: 1080, imageQuality: 80);
+  /// 處理不同的上傳類型
+  Future<void> _handleUploadType(UploadType uploadType) async {
+    final uploadService = ref.read(uploadServiceProvider);
 
-          // 開啟相機
-          break;
-        // 開啟圖片選擇器
-        case UploadType.image:
-        // 開啟影片選擇器
-        case UploadType.video:
-        // 開啟檔案選擇器
-        case UploadType.file:
-          final pickResult = await uploadService.handleUploadOptionSelection(
-            result,
-            maxWidth: 1080,
-            maxHeight: 1080,
-            imageQuality: 80,
-            allowMultiple: true,
-          );
-          if (pickResult.isSuccess && pickResult.data != null) {
-            // 處理選擇的媒體文件
-            handleMediaResult(ref, pickResult.data!);
-          } else {
-            // 處理錯誤
-            handlePickError(ref, pickResult.error, pickResult.errorMessage);
-          }
-          break;
+    switch (uploadType) {
+      case UploadType.camera:
+        final result = await uploadService.pickImageFromCamera(maxWidth: 1080, maxHeight: 1080, imageQuality: 80);
 
-        case UploadType.link:
-          // 開啟連結掃描器
-          break;
+        // await result.map(
+        //   success: (s) async => await _uploadMediaFiles(context, ref, s.data),
+        //   failure: (f) => _showPickError(context, ref, f.error, f.errorMessage),
+        // );
+        break;
 
-        case UploadType.text:
-          // 開啟文字檔編輯器
-          break;
+      case UploadType.image:
+      case UploadType.video:
+      case UploadType.file:
+        break;
 
-        case UploadType.ai:
-          // 開啟AI圖像分類器
-          break;
-      }
+      case UploadType.link:
+        break;
+
+      case UploadType.text:
+        break;
+
+      case UploadType.ai:
+        break;
     }
   }
 
   // 處理選擇的媒體結果
   /// 處理選擇的媒體結果並上傳到伺服器
   /// 處理選擇的媒體結果並上傳到伺服器
-  Future<void> handleMediaResult(WidgetRef ref, List<MediaPickResult> mediaResults) async {
-    try {
-      // 取得當前選中的 Gallery Type
-      final selectedTypeAsync = await ref.read(selectedGalleryTypeProvider.future);
-      final galleryTypeId = selectedTypeAsync.id;
+  // Future<void> handleMediaResult(WidgetRef ref, List<MediaPickResult> mediaResults) async {
+  //   try {
+  //     // 取得當前選中的 Gallery Type
+  //     final selectedTypeAsync = await ref.read(selectedGalleryTypeProvider.future);
+  //     final galleryTypeId = selectedTypeAsync.id;
 
-      // 取得當前選中的標籤 IDs
-      final selectedTagIds = ref.read(selectedTagIdsProvider);
+  //     // 取得當前選中的標籤 IDs
+  //     final selectedTagIds = ref.read(selectedTagIdsProvider);
 
-      if (selectedTagIds.isEmpty) {
-        // 如果沒有選擇標籤，顯示警告
-        ref.read(dialogServiceProvider).warning('缺少標籤', '請先選擇至少一個標籤以便分類上傳的檔案', onOk: () {});
-        return;
-      }
+  //     if (selectedTagIds.isEmpty) {
+  //       // 如果沒有選擇標籤，顯示警告
+  //       ref.read(dialogServiceProvider).warning('缺少標籤', '請先選擇至少一個標籤以便分類上傳的檔案', onOk: () {});
+  //       return;
+  //     }
 
-      // 取得媒體資料來源
-      final mediaDataSource = await ref.read(remoteMediaDataSourceProvider.future);
+  //     // 取得媒體資料來源
+  //     final mediaDataSource = await ref.read(remoteMediaDataSourceProvider.future);
 
-      int successCount = 0;
-      int failCount = 0;
+  //     int successCount = 0;
+  //     int failCount = 0;
 
-      // 上傳所有檔案
-      for (int i = 0; i < mediaResults.length; i++) {
-        final media = mediaResults[i];
-        try {
-          // 上傳檔案
-          await mediaDataSource.uploadGalleryMedia(
-            uploadType: uploadType,
-            galleryTypeId: galleryTypeId,
-            file: media.file!,
-            fileName: media.fileName,
-            tagsId: selectedTagIds,
-            onSendProgress: (sent, total) {
-              // 更新單個檔案進度
-              final fileProgress = sent / total;
+  //     // 上傳所有檔案
+  //     for (int i = 0; i < mediaResults.length; i++) {
+  //       final media = mediaResults[i];
+  //       try {
+  //         // 上傳檔案
+  //         await mediaDataSource.uploadGalleryMedia(
+  //           uploadType: uploadType,
+  //           galleryTypeId: galleryTypeId,
+  //           file: media.file!,
+  //           fileName: media.fileName,
+  //           tagsId: selectedTagIds,
+  //           onSendProgress: (sent, total) {
+  //             // 更新單個檔案進度
+  //             final fileProgress = sent / total;
 
-              // 更新總體進度
-              // (已完成的檔案 + 當前檔案進度) / 總檔案數
-              final overallProgress = (successCount + failCount + fileProgress) / mediaResults.length;
-            },
-          );
+  //             // 更新總體進度
+  //             // (已完成的檔案 + 當前檔案進度) / 總檔案數
+  //             final overallProgress = (successCount + failCount + fileProgress) / mediaResults.length;
+  //           },
+  //         );
 
-          successCount++;
+  //         successCount++;
 
-          // 記錄成功
-          debugPrint('檔案 ${media.fileName} 上傳成功');
-        } catch (e) {
-          failCount++;
+  //         // 記錄成功
+  //         debugPrint('檔案 ${media.fileName} 上傳成功');
+  //       } catch (e) {
+  //         failCount++;
 
-          // 記錄錯誤
-          debugPrint('檔案 ${media.fileName} 上傳失敗: ${e.toString()}');
+  //         // 記錄錯誤
+  //         debugPrint('檔案 ${media.fileName} 上傳失敗: ${e.toString()}');
 
-          // 短暫延遲，使用戶能看到錯誤訊息
-          await Future.delayed(const Duration(milliseconds: 800));
-        }
-      }
-    } catch (e) {
-      // 處理整體錯誤
-      ref.read(dialogServiceProvider).error('上傳過程中出錯', e.toString());
-    } finally {}
-  }
+  //         // 短暫延遲，使用戶能看到錯誤訊息
+  //         await Future.delayed(const Duration(milliseconds: 800));
+  //       }
+  //     }
+  //   } catch (e) {
+  //     // 處理整體錯誤
+  //     ref.read(dialogServiceProvider).error('上傳過程中出錯', e.toString());
+  //   } finally {}
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -175,7 +161,9 @@ class _ClassifierTagScreenState extends ConsumerState<ClassifierTagScreen> {
             floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
             floatingActionButton: FloatingActionButton(
               shape: const CircleBorder(),
-              onPressed: () {},
+              onPressed: () {
+                showUploadOptions();
+              },
               backgroundColor: AppColors.darkGold, // 使用你應用中的主題顏色
               foregroundColor: Colors.white,
               child: const Icon(Icons.upload),
