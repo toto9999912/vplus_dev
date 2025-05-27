@@ -1,4 +1,5 @@
 // lib/feature/upload/widgets/upload_progress_dialog.dart
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/upload_progress_provider.dart';
@@ -15,6 +16,9 @@ class UploadProgressDialog extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final uploadState = ref.watch(uploadProgressProvider);
 
+    // 添加調試信息
+    debugPrint('UploadProgressDialog.build: 當前狀態 = ${uploadState.runtimeType}');
+
     return Dialog(
       backgroundColor: Colors.transparent,
       elevation: 0,
@@ -28,13 +32,19 @@ class UploadProgressDialog extends ConsumerWidget {
             boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 20, offset: const Offset(0, 10))],
           ),
           child: uploadState.when(
-            idle: () => const SizedBox.shrink(),
+            idle: () => const _LoadingContent(),
             uploading:
                 (progress, fileName, currentIndex, totalFiles) =>
                     _UploadingContent(progress: progress, fileName: fileName, currentIndex: currentIndex, totalFiles: totalFiles),
             success:
-                (successCount, totalCount) =>
-                    _SuccessContent(successCount: successCount, totalCount: totalCount, onClose: () => Navigator.of(context).pop()),
+                (successCount, totalCount) => _SuccessContent(
+                  successCount: successCount,
+                  totalCount: totalCount,
+                  onClose: () {
+                    ref.read(uploadProgressProvider.notifier).reset();
+                    Navigator.of(context).pop();
+                  },
+                ),
             error:
                 (message, fileName) => _ErrorContent(
                   message: message,
@@ -43,11 +53,41 @@ class UploadProgressDialog extends ConsumerWidget {
                     ref.read(uploadProgressProvider.notifier).reset();
                     Navigator.of(context).pop();
                   },
-                  onClose: () => Navigator.of(context).pop(),
+                  onClose: () {
+                    ref.read(uploadProgressProvider.notifier).reset();
+                    Navigator.of(context).pop();
+                  },
                 ),
           ),
         ),
       ),
+    );
+  }
+}
+
+class _LoadingContent extends StatelessWidget {
+  const _LoadingContent();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        // 圓形載入指示器
+        SizedBox(
+          width: 100,
+          height: 100,
+          child: CircularProgressIndicator(
+            strokeWidth: 8,
+            backgroundColor: Colors.grey[200],
+            valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).primaryColor),
+          ),
+        ),
+        const SizedBox(height: 24),
+
+        // 載入文字
+        Text('準備上傳中...', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500), textAlign: TextAlign.center),
+      ],
     );
   }
 }

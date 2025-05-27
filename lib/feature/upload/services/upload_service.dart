@@ -33,12 +33,6 @@ class UploadService {
 
       case UploadType.file:
         return pickFiles(allowMultiple: allowMultiple, maxFileSize: maxFileSize);
-
-      case UploadType.link:
-      case UploadType.text:
-      case UploadType.ai:
-        // 這些類型需要自定義處理
-        return const UploadResult.failure(error: MediaPickError.unsupportedPlatform, errorMessage: '此功能尚未實現');
     }
   }
 
