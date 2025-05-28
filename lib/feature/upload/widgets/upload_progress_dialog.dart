@@ -1,5 +1,3 @@
-// lib/feature/upload/widgets/upload_progress_dialog.dart
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/upload_progress_provider.dart';
@@ -16,26 +14,30 @@ class UploadProgressDialog extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final uploadState = ref.watch(uploadProgressProvider);
 
-    // 添加調試信息
-    debugPrint('UploadProgressDialog.build: 當前狀態 = ${uploadState.runtimeType}');
-
     return Dialog(
       backgroundColor: Colors.transparent,
       elevation: 0,
       child: Center(
         child: Container(
-          width: 280,
+          width: 300,
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(16),
-            boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 20, offset: const Offset(0, 10))],
+            boxShadow: [BoxShadow(color: Colors.black.withAlpha(26), blurRadius: 20, offset: const Offset(0, 10))],
           ),
           child: uploadState.when(
             idle: () => const _LoadingContent(),
             uploading:
-                (progress, fileName, currentIndex, totalFiles) =>
-                    _UploadingContent(progress: progress, fileName: fileName, currentIndex: currentIndex, totalFiles: totalFiles),
+                (overallProgress, totalBytes, uploadedBytes, currentFileName, currentFileIndex, totalFiles, completedFiles) => _UploadingContent(
+                  overallProgress: overallProgress,
+                  totalBytes: totalBytes,
+                  uploadedBytes: uploadedBytes,
+                  currentFileName: currentFileName,
+                  currentFileIndex: currentFileIndex,
+                  totalFiles: totalFiles,
+                  completedFiles: completedFiles,
+                ),
             success:
                 (successCount, totalCount) => _SuccessContent(
                   successCount: successCount,
@@ -73,66 +75,105 @@ class _LoadingContent extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        // 圓形載入指示器
         SizedBox(
-          width: 100,
-          height: 100,
+          width: 60,
+          height: 60,
           child: CircularProgressIndicator(
-            strokeWidth: 8,
+            strokeWidth: 4,
             backgroundColor: Colors.grey[200],
             valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).primaryColor),
           ),
         ),
-        const SizedBox(height: 24),
-
-        // 載入文字
-        Text('準備上傳中...', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500), textAlign: TextAlign.center),
+        const SizedBox(height: 20),
+        const Text('準備上傳中...', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500), textAlign: TextAlign.center),
       ],
     );
   }
 }
 
 class _UploadingContent extends StatelessWidget {
-  final double progress;
-  final String fileName;
-  final int currentIndex;
+  final double overallProgress;
+  final int totalBytes;
+  final int uploadedBytes;
+  final String currentFileName;
+  final int currentFileIndex;
   final int totalFiles;
+  final int completedFiles;
 
-  const _UploadingContent({required this.progress, required this.fileName, required this.currentIndex, required this.totalFiles});
+  const _UploadingContent({
+    required this.overallProgress,
+    required this.totalBytes,
+    required this.uploadedBytes,
+    required this.currentFileName,
+    required this.currentFileIndex,
+    required this.totalFiles,
+    required this.completedFiles,
+  });
+
+  String _formatBytes(int bytes) {
+    if (bytes < 1024) return '$bytes B';
+    if (bytes < 1024 * 1024) return '${(bytes / 1024).toStringAsFixed(1)} KB';
+    if (bytes < 1024 * 1024 * 1024) return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
+    return '${(bytes / (1024 * 1024 * 1024)).toStringAsFixed(1)} GB';
+  }
 
   @override
   Widget build(BuildContext context) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        // 圓形進度指示器
+        // 圓形進度指示器 - 顯示整體進度
         Stack(
           alignment: Alignment.center,
           children: [
             SizedBox(
-              width: 100,
-              height: 100,
+              width: 90,
+              height: 90,
               child: CircularProgressIndicator(
-                value: progress,
+                value: overallProgress,
                 strokeWidth: 8,
                 backgroundColor: Colors.grey[200],
                 valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).primaryColor),
               ),
             ),
-            Text('${(progress * 100).toInt()}%', style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+            Text('${(overallProgress * 100).toInt()}%', style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
           ],
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: 20),
 
-        // 檔案資訊
-        Text('正在上傳 ($currentIndex/$totalFiles)', style: TextStyle(fontSize: 14, color: Colors.grey[600])),
+        // 整體進度資訊
+        Text('${_formatBytes(uploadedBytes)} / ${_formatBytes(totalBytes)}', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
         const SizedBox(height: 8),
-        Text(
-          fileName,
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-          textAlign: TextAlign.center,
-          maxLines: 2,
-          overflow: TextOverflow.ellipsis,
+
+        // 檔案進度資訊
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.check_circle, color: Colors.green, size: 16),
+            const SizedBox(width: 4),
+            Text('$completedFiles', style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+            Text(' / $totalFiles 個檔案', style: TextStyle(fontSize: 14, color: Colors.grey[600])),
+          ],
+        ),
+        const SizedBox(height: 12),
+
+        // 當前檔案資訊
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          decoration: BoxDecoration(color: Colors.grey[100], borderRadius: BorderRadius.circular(8)),
+          child: Column(
+            children: [
+              Text('正在上傳第 $currentFileIndex 個檔案', style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+              const SizedBox(height: 4),
+              Text(
+                currentFileName,
+                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
         ),
       ],
     );
@@ -155,18 +196,18 @@ class _SuccessContent extends StatelessWidget {
       children: [
         // 成功圖標
         Container(
-          width: 80,
-          height: 80,
+          width: 70,
+          height: 70,
           decoration: BoxDecoration(color: hasFailures ? Colors.orange : Colors.green, shape: BoxShape.circle),
-          child: Icon(hasFailures ? Icons.warning_rounded : Icons.check_rounded, color: Colors.white, size: 48),
+          child: Icon(hasFailures ? Icons.warning_rounded : Icons.check_rounded, color: Colors.white, size: 40),
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: 20),
 
         // 結果文字
-        Text(hasFailures ? '部分上傳完成' : '上傳成功', style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+        Text(hasFailures ? '部分上傳完成' : '上傳成功', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
         const SizedBox(height: 8),
-        Text('成功上傳 $successCount/$totalCount 個檔案', style: TextStyle(fontSize: 16, color: Colors.grey[600])),
-        const SizedBox(height: 24),
+        Text('成功上傳 $successCount/$totalCount 個檔案', style: TextStyle(fontSize: 14, color: Colors.grey[600])),
+        const SizedBox(height: 20),
 
         // 關閉按鈕
         SizedBox(width: double.infinity, child: ElevatedButton(onPressed: onClose, child: const Text('完成'))),
@@ -190,15 +231,15 @@ class _ErrorContent extends StatelessWidget {
       children: [
         // 錯誤圖標
         Container(
-          width: 80,
-          height: 80,
+          width: 70,
+          height: 70,
           decoration: const BoxDecoration(color: Colors.red, shape: BoxShape.circle),
-          child: const Icon(Icons.close_rounded, color: Colors.white, size: 48),
+          child: const Icon(Icons.close_rounded, color: Colors.white, size: 40),
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: 20),
 
         // 錯誤訊息
-        const Text('上傳失敗', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+        const Text('上傳失敗', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
         const SizedBox(height: 8),
         if (fileName != null) ...[
           Text(
@@ -217,7 +258,7 @@ class _ErrorContent extends StatelessWidget {
           maxLines: 3,
           overflow: TextOverflow.ellipsis,
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: 20),
 
         // 操作按鈕
         Row(
