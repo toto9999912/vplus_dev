@@ -10,8 +10,8 @@ part 'gallery_media_provider.g.dart';
 
 /// 標籤搜尋媒體用例 Provider
 @riverpod
-Future<GetTagSearchMediaUsecase> getTagSearchMediaUsecase(Ref ref) async {
-  final mediaRepository = await ref.watch(mediaRepositoryProvider.future);
+GetTagSearchMediaUsecase getTagSearchMediaUsecase(Ref ref) {
+  final mediaRepository = ref.watch(mediaRepositoryProvider);
   return GetTagSearchMediaUsecase(mediaRepository);
 }
 
@@ -39,7 +39,7 @@ class GalleryMediaNotifier extends _$GalleryMediaNotifier {
       state = AsyncValue.data(state.valueOrNull?.copyWith(isLoading: true) ?? const GalleryMediaState(isLoading: true));
 
       // 獲取 usecase
-      final usecase = await ref.read(getTagSearchMediaUsecaseProvider.future);
+      final usecase = ref.read(getTagSearchMediaUsecaseProvider);
 
       // 執行用例獲取媒體資料
       final medias = await usecase.execute(tagIds);

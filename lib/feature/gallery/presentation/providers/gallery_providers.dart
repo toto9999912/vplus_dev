@@ -13,6 +13,7 @@ import '../../data/repositories/media_repository_impl.dart';
 import '../../domain/entities/gallery_type.dart';
 import '../../domain/usecases/get_classifier_tag_usecase.dart';
 import '../../domain/usecases/get_gallery_types_usecase.dart';
+import '../../domain/usecases/upload_gallery_media_usecase.dart';
 
 part 'gallery_providers.g.dart';
 
@@ -39,7 +40,7 @@ GalleryRepository galleryRepository(Ref ref) {
 /// 媒體遠程數據源 Provider
 /// 提供從後端獲取媒體相關數據的數據源
 @riverpod
-Future<MediaDataSource> remoteMediaDataSource(Ref ref) async {
+MediaDataSource remoteMediaDataSource(Ref ref) {
   final apiClient = ref.watch(nestjsApiClientProvider);
   return RemoteMediaDataSourceImpl(apiClient);
 }
@@ -47,8 +48,8 @@ Future<MediaDataSource> remoteMediaDataSource(Ref ref) async {
 /// 媒體倉庫 Provider
 /// 提供對媒體數據的訪問和操作
 @riverpod
-Future<MediaRepository> mediaRepository(Ref ref) async {
-  final dataSource = await ref.watch(remoteMediaDataSourceProvider.future);
+MediaRepository mediaRepository(Ref ref) {
+  final dataSource = ref.watch(remoteMediaDataSourceProvider);
   return MediaRepositoryImpl(dataSource);
 }
 
@@ -68,6 +69,13 @@ GetGalleryTypesUseCase getGalleryTypesUseCase(Ref ref) {
 GetClassifierTagUseCase getClassifierTagUseCase(Ref ref) {
   final repository = ref.watch(galleryRepositoryProvider);
   return GetClassifierTagUseCase(repository);
+}
+
+/// 獲取 Classifier 標籤用例 Provider
+@riverpod
+UploadGalleryMediaUsecase uploadGalleryMediaUsecase(Ref ref) {
+  final repository = ref.watch(mediaRepositoryProvider);
+  return UploadGalleryMediaUsecase(repository);
 }
 
 //==============================================================================

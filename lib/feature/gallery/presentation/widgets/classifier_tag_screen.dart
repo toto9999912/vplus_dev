@@ -140,7 +140,7 @@ class _ClassifierTagScreenState extends ConsumerState<ClassifierTagScreen> {
       }
 
       // 取得媒體資料來源
-      final mediaDataSource = await ref.read(remoteMediaDataSourceProvider.future);
+      final uploadMediaUsecase = ref.read(uploadGalleryMediaUsecaseProvider);
 
       // 取得上傳進度通知器
       final uploadProgress = ref.read(uploadProgressProvider.notifier);
@@ -181,14 +181,6 @@ class _ClassifierTagScreenState extends ConsumerState<ClassifierTagScreen> {
       int successCount = 0;
       int failCount = 0;
 
-      // 決定上傳類型字串
-      final String uploadTypeStr =
-          uploadType == GalleryUploadType.image
-              ? 'image'
-              : uploadType == GalleryUploadType.video
-              ? 'video'
-              : 'file';
-
       // 上傳所有檔案
       for (int i = 0; i < validMediaResults.length; i++) {
         final media = validMediaResults[i];
@@ -205,8 +197,8 @@ class _ClassifierTagScreenState extends ConsumerState<ClassifierTagScreen> {
           );
 
           // 上傳檔案
-          await mediaDataSource.uploadGalleryMedia(
-            uploadType: uploadTypeStr,
+          await uploadMediaUsecase.execute(
+            uploadType: uploadType.name,
             galleryTypeId: galleryTypeId,
             file: media.file!,
             fileName: media.fileName,
