@@ -209,4 +209,101 @@ class UploadService {
     if (mimeType.startsWith('video/')) return 'video';
     return 'file';
   }
+
+  /// 處理多檔案上傳流程
+  /// 該方法會管理整個上傳流程，包括進度管理
+  /// [mediaResults] 要上傳的媒體檔案列表
+  /// [uploadCallback] 實際執行上傳的回調函數，接收媒體檔案和進度回調
+  /// [progressManager] 進度管理器
+  /// [onSuccess] 上傳成功後的回調
+  /// [onError] 上傳失敗後的回調
+  Future<void> uploadMediaFiles({
+    required List<MediaPickResult> mediaResults,
+    required Future<void> Function(MediaPickResult media, Function(int sent, int total) onSendProgress) uploadCallback,
+    required UploadProgressManager progressManager,
+    VoidCallback? onSuccess,
+    Function(String error)? onError,
+  }) async {
+    // 過濾有效的檔案並收集檔案資訊
+    final validMediaResults = <MediaPickResult>[];
+    final fileSizes = <int>[];
+    final fileNames = <String>[];
+
+    for (final media in mediaResults) {
+      if (media.file != null) {
+        fileSizes.add(media.fileSize);
+        fileNames.add(media.fileName);
+        validMediaResults.add(media);
+      }
+    }
+
+    if (validMediaResults.isEmpty) {
+      onError?.call('所選檔案都無效，無法上傳');
+      return;
+    }
+
+    int successCount = 0;
+    int failCount = 0;
+
+    try {
+      // 初始化並顯示進度
+      progressManager.initializeUpload(fileSizes: fileSizes, fileNames: fileNames);
+
+      // 上傳所有檔案
+      for (int i = 0; i < validMediaResults.length; i++) {
+        final media = validMediaResults[i];
+
+        try {
+          // 設定當前檔案的初始進度
+          progressManager.updateFileProgress(
+            fileName: media.fileName,
+            uploadedBytes: 0,
+            currentFileIndex: i + 1,
+            totalFiles: validMediaResults.length,
+          );
+
+          // 執行實際上傳
+          await uploadCallback(media, (sent, total) {
+            progressManager.updateFileProgress(
+              fileName: media.fileName,
+              uploadedBytes: sent,
+              currentFileIndex: i + 1,
+              totalFiles: validMediaResults.length,
+            );
+          });
+
+          // 標記檔案完成
+          progressManager.markFileCompleted(media.fileName);
+          successCount++;
+        } catch (e) {
+          failCount++;
+
+          if (i == validMediaResults.length - 1 || failCount == validMediaResults.length) {
+            progressManager.setError(message: '檔案 ${media.fileName} 上傳失敗: ${e.toString()}', fileName: media.fileName);
+            await Future.delayed(const Duration(milliseconds: 800));
+          }
+        }
+      }
+
+      // 設置最終結果
+      if (failCount == 0 && successCount > 0) {
+        progressManager.setSuccess(successCount: successCount, totalCount: validMediaResults.length);
+        onSuccess?.call();
+      } else if (failCount > 0) {
+        progressManager.setError(message: '上傳完成：成功 $successCount 個，失敗 $failCount 個', fileName: null);
+      }
+    } catch (e) {
+      progressManager.setError(message: '上傳過程中出錯: ${e.toString()}', fileName: null);
+      onError?.call(e.toString());
+    }
+  }
+}
+
+/// 上傳進度管理器接口
+abstract class UploadProgressManager {
+  void initializeUpload({required List<int> fileSizes, required List<String> fileNames});
+  void updateFileProgress({required String fileName, required int uploadedBytes, required int currentFileIndex, required int totalFiles});
+  void markFileCompleted(String fileName);
+  void setSuccess({required int successCount, required int totalCount});
+  void setError({required String message, String? fileName});
 }

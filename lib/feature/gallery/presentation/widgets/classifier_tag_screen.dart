@@ -8,9 +8,9 @@ import 'package:vplus_dev/core/providers/service_providers.dart';
 import 'package:vplus_dev/core/router/app_router.gr.dart';
 import 'package:vplus_dev/feature/upload/enum/media_pick_error.dart';
 import 'package:vplus_dev/feature/upload/models/media_pick_result.dart';
-import 'package:vplus_dev/feature/upload/providers/upload_progress_provider.dart';
 import 'package:vplus_dev/feature/upload/providers/upload_service_provider.dart';
-import 'package:vplus_dev/feature/upload/widgets/upload_progress_dialog.dart';
+import 'package:vplus_dev/feature/upload/services/upload_service.dart';
+import 'package:vplus_dev/feature/upload/services/upload_progress_manager_impl.dart';
 import 'package:vplus_dev/shared/enum/access_mode.dart';
 import 'package:vplus_dev/shared/models/bottom_sheet_option.dart';
 
@@ -137,115 +137,38 @@ class _ClassifierTagScreenState extends ConsumerState<ClassifierTagScreen> {
         // 如果沒有選擇標籤，顯示警告
         ref.read(dialogServiceProvider).warning('缺少標籤', '請先選擇至少一個標籤以便分類上傳的檔案', onOk: () {});
         return;
-      }
-
-      // 取得媒體資料來源
+      } // 取得相關服務
       final uploadMediaUsecase = ref.read(uploadGalleryMediaUsecaseProvider);
+      final uploadService = UploadService();
+      final progressManager = ref.read(uploadProgressManagerProvider(mounted ? context : null));
 
-      // 取得上傳進度通知器
-      final uploadProgress = ref.read(uploadProgressProvider.notifier);
-
-      // 重置上傳進度狀態
-      debugPrint('重置上傳進度狀態');
-      uploadProgress.reset();
-
-      // 準備檔案大小和名稱列表
-      final fileSizes = <int>[];
-      final fileNames = <String>[];
-      final validMediaResults = <MediaPickResult>[];
-
-      // 過濾有效的檔案並收集檔案資訊
-      for (final media in mediaResults) {
-        if (media.file != null) {
-          fileSizes.add(media.fileSize);
-          fileNames.add(media.fileName);
-          validMediaResults.add(media);
-        }
-      }
-
-      if (validMediaResults.isEmpty) {
-        ref.read(dialogServiceProvider).error('無效檔案', '所選檔案都無效，無法上傳');
-        return;
-      }
-
-      // 初始化上傳進度
-      uploadProgress.initializeUpload(fileSizes: fileSizes, fileNames: fileNames);
-
-      // 顯示上傳進度對話框
-      debugPrint('顯示上傳進度對話框');
-      if (mounted) {
-        UploadProgressDialog.show(context);
-        await Future.delayed(const Duration(milliseconds: 100));
-      }
-
-      int successCount = 0;
-      int failCount = 0;
-
-      // 上傳所有檔案
-      for (int i = 0; i < validMediaResults.length; i++) {
-        final media = validMediaResults[i];
-
-        try {
-          debugPrint('開始上傳檔案: ${media.fileName} (${i + 1}/${validMediaResults.length})');
-
-          // 設定當前檔案的初始進度
-          uploadProgress.updateFileProgress(
-            fileName: media.fileName,
-            uploadedBytes: 0,
-            currentFileIndex: i + 1,
-            totalFiles: validMediaResults.length,
-          );
-
-          // 上傳檔案
+      // 使用 upload service 處理整個上傳流程
+      await uploadService.uploadMediaFiles(
+        mediaResults: mediaResults,
+        uploadCallback: (media, onSendProgress) async {
+          // 執行實際的 gallery 上傳
           await uploadMediaUsecase.execute(
             uploadType: uploadType.name,
             galleryTypeId: galleryTypeId,
             file: media.file!,
             fileName: media.fileName,
             tagsId: selectedTagIds,
-            onSendProgress: (sent, total) {
-              // 更新檔案的上傳進度
-              uploadProgress.updateFileProgress(
-                fileName: media.fileName,
-                uploadedBytes: sent,
-                currentFileIndex: i + 1,
-                totalFiles: validMediaResults.length,
-              );
-            },
+            onSendProgress: onSendProgress,
           );
-
-          // 標記檔案完成
-          uploadProgress.markFileCompleted(media.fileName);
-          successCount++;
-          debugPrint('檔案 ${media.fileName} 上傳成功');
-        } catch (e) {
-          failCount++;
-          debugPrint('檔案 ${media.fileName} 上傳失敗: ${e.toString()}');
-
-          // 如果有其他檔案要上傳，繼續；否則顯示錯誤
-          if (i == validMediaResults.length - 1 || failCount == validMediaResults.length) {
-            uploadProgress.setError(message: '檔案 ${media.fileName} 上傳失敗: ${e.toString()}', fileName: media.fileName);
-            await Future.delayed(const Duration(milliseconds: 800));
-          }
-        }
-      }
-
-      // 設置最終結果
-      if (failCount == 0 && successCount > 0) {
-        debugPrint('所有檔案上傳成功，設置成功狀態');
-        uploadProgress.setSuccess(successCount: successCount, totalCount: validMediaResults.length);
-      } else if (failCount > 0) {
-        debugPrint('上傳完成但有失敗，設置錯誤狀態');
-        uploadProgress.setError(message: '上傳完成：成功 $successCount 個，失敗 $failCount 個', fileName: null);
-      }
+        },
+        progressManager: progressManager,
+        onSuccess: () {
+          debugPrint('所有檔案上傳成功');
+          // 可以在這裡添加額外的成功處理邏輯
+        },
+        onError: (error) {
+          debugPrint('上傳失敗: $error');
+          ref.read(dialogServiceProvider).error('上傳失敗', error);
+        },
+      );
     } catch (e) {
       // 處理整體錯誤
       debugPrint('handleMediaResult: 整體錯誤 - $e');
-
-      // 設置錯誤狀態
-      ref.read(uploadProgressProvider.notifier).setError(message: '上傳過程中出錯: ${e.toString()}', fileName: null);
-
-      // 顯示錯誤對話框
       ref.read(dialogServiceProvider).error('上傳過程中出錯', e.toString());
     }
   }
