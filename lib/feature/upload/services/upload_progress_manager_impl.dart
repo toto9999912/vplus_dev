@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/upload_progress_provider.dart';
 import '../widgets/upload_progress_dialog.dart';
-import 'upload_service.dart';
 
 /// 具體的進度管理器實現，包裝 UploadProgressProvider
 class UploadProgressManagerImpl implements UploadProgressManager {
@@ -58,3 +57,12 @@ final uploadProgressManagerProvider = Provider.family<UploadProgressManagerImpl,
   final notifier = ref.read(uploadProgressProvider.notifier);
   return UploadProgressManagerImpl(notifier, context: context);
 });
+
+/// 上傳進度管理器接口
+abstract class UploadProgressManager {
+  void initializeUpload({required List<int> fileSizes, required List<String> fileNames});
+  void updateFileProgress({required String fileName, required int uploadedBytes, required int currentFileIndex, required int totalFiles});
+  void markFileCompleted(String fileName);
+  void setSuccess({required int successCount, required int totalCount});
+  void setError({required String message, String? fileName});
+}

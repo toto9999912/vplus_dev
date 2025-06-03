@@ -8,6 +8,7 @@ import '../enum/media_pick_error.dart';
 import '../enum/upload_type.dart';
 import '../models/media_pick_result.dart';
 import '../models/upload_result.dart';
+import 'upload_progress_manager_impl.dart';
 
 class UploadService {
   final ImagePicker _imagePicker = ImagePicker();
@@ -297,13 +298,4 @@ class UploadService {
       onError?.call(e.toString());
     }
   }
-}
-
-/// 上傳進度管理器接口
-abstract class UploadProgressManager {
-  void initializeUpload({required List<int> fileSizes, required List<String> fileNames});
-  void updateFileProgress({required String fileName, required int uploadedBytes, required int currentFileIndex, required int totalFiles});
-  void markFileCompleted(String fileName);
-  void setSuccess({required int successCount, required int totalCount});
-  void setError({required String message, String? fileName});
 }
