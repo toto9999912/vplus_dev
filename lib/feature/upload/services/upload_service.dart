@@ -4,6 +4,9 @@ import 'package:flutter/foundation.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:image/image.dart' as img;
+import 'package:path/path.dart' as path;
+import 'package:path_provider/path_provider.dart';
 import '../enum/media_pick_error.dart';
 import '../enum/upload_type.dart';
 import '../models/media_pick_result.dart';
@@ -12,6 +15,12 @@ import 'upload_progress_manager_impl.dart';
 
 class UploadService {
   final ImagePicker _imagePicker = ImagePicker();
+  
+  // 預設的圖片壓縮設定
+  static const int _defaultMaxWidth = 1920;
+  static const int _defaultMaxHeight = 1920;
+  static const int _defaultImageQuality = 85;
+  static const int _defaultMaxFileSize = 10; // MB
 
   /// 處理上傳選項選擇
   Future<UploadResult<List<MediaPickResult>>> handleUploadOptionSelection(
@@ -57,7 +66,20 @@ class UploadService {
         return const UploadResult.failure(error: MediaPickError.cancelled, errorMessage: '用戶取消了拍攝');
       }
 
-      final file = File(photo.path);
+      File file = File(photo.path);
+      
+      // 自動壓縮圖片
+      final compressedFile = await compressImage(
+        file,
+        maxWidth: maxWidth?.toInt(),
+        maxHeight: maxHeight?.toInt(),
+        quality: imageQuality,
+      );
+      
+      if (compressedFile != null) {
+        file = compressedFile;
+      }
+      
       final fileSize = await file.length();
 
       return UploadResult.success(data: [MediaPickResult(file: file, fileName: photo.name, mimeType: 'image/jpeg', fileSize: fileSize)]);
@@ -96,7 +118,20 @@ class UploadService {
 
       final results = <MediaPickResult>[];
       for (final image in images) {
-        final file = File(image.path);
+        File file = File(image.path);
+        
+        // 自動壓縮圖片
+        final compressedFile = await compressImage(
+          file,
+          maxWidth: maxWidth?.toInt(),
+          maxHeight: maxHeight?.toInt(),
+          quality: imageQuality,
+        );
+        
+        if (compressedFile != null) {
+          file = compressedFile;
+        }
+        
         final fileSize = await file.length();
 
         results.add(MediaPickResult(file: file, fileName: image.name, mimeType: image.mimeType ?? 'image/jpeg', fileSize: fileSize));
@@ -209,6 +244,123 @@ class UploadService {
     if (mimeType.startsWith('image/')) return 'image';
     if (mimeType.startsWith('video/')) return 'video';
     return 'file';
+  }
+
+  /// 壓縮圖片檔案
+  Future<File?> compressImage(
+    File imageFile, {
+    int? maxWidth,
+    int? maxHeight,
+    int? quality,
+    int? maxFileSizeKB,
+  }) async {
+    try {
+      // 讀取圖片
+      final imageBytes = await imageFile.readAsBytes();
+      img.Image? image = img.decodeImage(imageBytes);
+      
+      if (image == null) return null;
+      
+      // 設定壓縮參數
+      final targetWidth = maxWidth ?? _defaultMaxWidth;
+      final targetHeight = maxHeight ?? _defaultMaxHeight;
+      final targetQuality = quality ?? _defaultImageQuality;
+      final maxSizeKB = maxFileSizeKB ?? (_defaultMaxFileSize * 1024);
+      
+      // 計算縮放比例
+      double scale = 1.0;
+      if (image.width > targetWidth || image.height > targetHeight) {
+        final scaleX = targetWidth / image.width;
+        final scaleY = targetHeight / image.height;
+        scale = scaleX < scaleY ? scaleX : scaleY;
+      }
+      
+      // 縮放圖片
+      if (scale < 1.0) {
+        final newWidth = (image.width * scale).round();
+        final newHeight = (image.height * scale).round();
+        image = img.copyResize(image, width: newWidth, height: newHeight);
+      }
+      
+      // 壓縮並保存
+      List<int> compressedBytes;
+      final extension = path.extension(imageFile.path).toLowerCase();
+      
+      if (extension == '.png') {
+        compressedBytes = img.encodePng(image);
+      } else {
+        compressedBytes = img.encodeJpg(image, quality: targetQuality);
+      }
+      
+      // 如果壓縮後檔案仍然太大，進一步降低品質
+      if (compressedBytes.length > maxSizeKB * 1024) {
+        int adjustedQuality = targetQuality;
+        while (compressedBytes.length > maxSizeKB * 1024 && adjustedQuality > 20) {
+          adjustedQuality -= 10;
+          if (extension == '.png') {
+            // PNG 沒有品質參數，轉換為 JPEG
+            compressedBytes = img.encodeJpg(image, quality: adjustedQuality);
+          } else {
+            compressedBytes = img.encodeJpg(image, quality: adjustedQuality);
+          }
+        }
+      }
+      
+      // 建立暫存檔案
+      final tempDir = await getTemporaryDirectory();
+      final tempFile = File(path.join(tempDir.path, 
+          'compressed_${DateTime.now().millisecondsSinceEpoch}.jpg'));
+      
+      await tempFile.writeAsBytes(compressedBytes);
+      return tempFile;
+      
+    } catch (e) {
+      debugPrint('圖片壓縮失敗: $e');
+      return null;
+    }
+  }
+
+  /// 驗證檔案類型
+  bool isValidFileType(String fileName, List<String> allowedExtensions) {
+    final extension = path.extension(fileName).toLowerCase().replaceFirst('.', '');
+    return allowedExtensions.contains(extension);
+  }
+
+  /// 驗證檔案大小
+  bool isValidFileSize(int fileSize, int maxSizeMB) {
+    return fileSize <= maxSizeMB * 1024 * 1024;
+  }
+
+  /// 產生唯一檔案名稱
+  String generateUniqueFileName(String originalName) {
+    final extension = path.extension(originalName);
+    final baseName = path.basenameWithoutExtension(originalName);
+    final timestamp = DateTime.now().millisecondsSinceEpoch;
+    return '${baseName}_$timestamp$extension';
+  }
+
+  /// 清理暫存檔案
+  Future<void> cleanupTempFiles() async {
+    try {
+      final tempDir = await getTemporaryDirectory();
+      final tempFiles = tempDir.listSync()
+          .whereType<File>()
+          .where((file) => path.basename(file.path).startsWith('compressed_'));
+      
+      for (final file in tempFiles) {
+        try {
+          // 只刪除 1 小時前的暫存檔
+          final fileAge = DateTime.now().millisecondsSinceEpoch - file.statSync().modified.millisecondsSinceEpoch;
+          if (fileAge > 3600000) { // 1 小時 = 3600000 毫秒
+            await file.delete();
+          }
+        } catch (e) {
+          debugPrint('刪除暫存檔案失敗: $e');
+        }
+      }
+    } catch (e) {
+      debugPrint('清理暫存檔案失敗: $e');
+    }
   }
 
   /// 處理多檔案上傳流程

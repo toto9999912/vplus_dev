@@ -3,12 +3,12 @@ import 'package:vplus_dev/core/service/user_service.dart';
 import '../../data/repositories/auth_repository.dart';
 import '../../domain/entities/user_profile.dart';
 
-class LoginUseCase {
+class LoginUsecase {
   final AuthRepository repository;
   final TokenService tokenService;
   final UserService userService;
 
-  LoginUseCase(this.repository, this.tokenService, this.userService);
+  LoginUsecase(this.repository, this.tokenService, this.userService);
 
   Future<UserProfile> execute(String mobile, String password) async {
     final result = await repository.login(mobile, password);

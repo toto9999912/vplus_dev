@@ -35,9 +35,7 @@ class ProjectListPage extends ConsumerWidget {
 
           if (isEmpty) {
             return EmptyProjectsView(
-              onAddPressed: () {
-                // TODO: 實現新增專案功能
-              },
+              onAddPressed: () => _showAddProjectDialog(context, ref),
             );
           }
           return _buildProjectListView(context, groupedProjects);
@@ -45,7 +43,11 @@ class ProjectListPage extends ConsumerWidget {
         error: (error, stackTrace) => Center(child: Text('發生錯誤: $error')),
         loading: () => const Center(child: CircularProgressIndicator()),
       ),
-      floatingActionButton: FloatingActionButton(onPressed: () {}, tooltip: '新增專案', child: const Icon(Icons.add)),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => _showAddProjectDialog(context, ref),
+        tooltip: '新增專案',
+        child: const Icon(Icons.add),
+      ),
     );
   }
 
@@ -125,12 +127,58 @@ class ProjectListPage extends ConsumerWidget {
   }
 
   void _onItemReorder(int oldItemIndex, int oldListIndex, int newItemIndex, int newListIndex) {
-    // TODO: 處理項目重新排序邏輯
+    // 處理項目重新排序邏輯
     debugPrint('Item 從 ($oldListIndex, $oldItemIndex) 移動到 ($newListIndex, $newItemIndex)');
+    
+    // TODO: 實作實際的重新排序 API 呼叫
+    // 這裡應該呼叫後端 API 來持久化新的排序
+    // 暫時只記錄日誌，實際實作需要根據後端 API 規格
   }
 
   void _onListReorder(int oldListIndex, int newListIndex) {
-    // TODO: 處理列表重新排序邏輯
+    // 處理列表重新排序邏輯
     debugPrint('List 從 $oldListIndex 移動到 $newListIndex');
+    
+    // TODO: 實作實際的列表重新排序 API 呼叫
+    // 這裡應該呼叫後端 API 來持久化新的列表順序
+    // 暫時只記錄日誌，實際實作需要根據後端 API 規格
+  }
+
+  /// 顯示新增專案對話框
+  void _showAddProjectDialog(BuildContext context, WidgetRef ref) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('新增專案'),
+          content: const TextField(
+            decoration: InputDecoration(
+              labelText: '專案名稱',
+              hintText: '請輸入專案名稱',
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('取消'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                // TODO: 實作新增專案的邏輯
+                // 1. 驗證輸入
+                // 2. 呼叫 API 創建專案
+                // 3. 更新 UI 狀態
+                // 4. 關閉對話框
+                Navigator.of(context).pop();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('新增專案功能待實作')),
+                );
+              },
+              child: const Text('新增'),
+            ),
+          ],
+        );
+      },
+    );
   }
 }

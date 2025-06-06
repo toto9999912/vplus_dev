@@ -45,4 +45,22 @@ class UserService {
     await _storageService.remove(StorageKeys.userProfile);
     await _storageService.setBool(StorageKeys.isLoggedIn, false);
   }
+
+  // 獲取當前用戶 (新增方法，供 AuthProvider 使用)
+  Future<UserProfile?> getCurrentUser() async {
+    if (_userProfile == null) {
+      await loadUserProfile();
+    }
+    return _userProfile;
+  }
+
+  // 保存當前用戶 (新增方法，供 AuthProvider 使用)
+  Future<void> saveCurrentUser(UserProfile user) async {
+    await saveUserProfile(userProfile: user);
+  }
+
+  // 清除當前用戶 (新增方法，供 AuthProvider 使用)
+  Future<void> clearCurrentUser() async {
+    await clearUserProfile();
+  }
 }

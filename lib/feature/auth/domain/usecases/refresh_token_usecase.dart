@@ -1,11 +1,19 @@
+import '../entities/login_result.dart';
 import '../../data/repositories/auth_repository.dart';
 
-abstract class RefreshTokenUseCase {
+class RefreshTokenUsecase {
   final AuthRepository _authRepository;
 
-  RefreshTokenUseCase(this._authRepository);
+  RefreshTokenUsecase(this._authRepository);
 
-  Future<void> call() async {
-    await _authRepository.refreshToken();
+  /// 執行 Token 刷新
+  /// 
+  /// 返回新的 LoginResult 如果成功，否則返回 null
+  Future<LoginResult?> execute() async {
+    try {
+      return await _authRepository.refreshToken();
+    } catch (e) {
+      return null;
+    }
   }
 }

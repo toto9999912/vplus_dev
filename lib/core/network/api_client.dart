@@ -65,13 +65,18 @@ class ApiClient {
     required T Function(Object?) fromJsonT,
     bool withToken = false,
   }) async {
-    final response = await _client.post(
-      path, // 同上
-      queryParameters: params,
-      data: body,
-      options: Options(headers: createHeaders(headers: headers, withToken: withToken)),
-    );
-    return ApiResponse.fromJson(response.data, fromJsonT);
+    try {
+      final response = await _client.post(
+        path,
+        queryParameters: params,
+        data: body,
+        options: Options(headers: createHeaders(headers: headers, withToken: withToken)),
+      );
+      return ApiResponse.fromJson(response.data, fromJsonT);
+    } catch (e) {
+      debugPrint('post error: $e');
+      rethrow;
+    }
   }
 
   Future<ApiResponse<T?>> put<T>(
@@ -82,16 +87,21 @@ class ApiClient {
     T? Function(Object?)? fromJsonT,
     bool withToken = false,
   }) async {
-    final response = await _client.put(
-      path, // 同上
-      queryParameters: params,
-      data: body,
-      options: Options(headers: createHeaders(headers: headers, withToken: withToken)),
-    );
-    if (fromJsonT == null) {
-      return ApiResponse(code: response.data?['code'] ?? "0", message: response.data?['message'] ?? "success", data: null);
-    } else {
-      return ApiResponse.fromJson(response.data, fromJsonT);
+    try {
+      final response = await _client.put(
+        path,
+        queryParameters: params,
+        data: body,
+        options: Options(headers: createHeaders(headers: headers, withToken: withToken)),
+      );
+      if (fromJsonT == null) {
+        return ApiResponse(code: response.data?['code'] ?? "0", message: response.data?['message'] ?? "success", data: null);
+      } else {
+        return ApiResponse.fromJson(response.data, fromJsonT);
+      }
+    } catch (e) {
+      debugPrint('put error: $e');
+      rethrow;
     }
   }
 
@@ -103,13 +113,18 @@ class ApiClient {
     required T Function(Object?) fromJsonT,
     bool withToken = false,
   }) async {
-    final response = await _client.delete(
-      path, // 同上
-      queryParameters: params,
-      data: body,
-      options: Options(headers: createHeaders(headers: headers, withToken: withToken)),
-    );
-    return ApiResponse.fromJson(response.data, fromJsonT);
+    try {
+      final response = await _client.delete(
+        path,
+        queryParameters: params,
+        data: body,
+        options: Options(headers: createHeaders(headers: headers, withToken: withToken)),
+      );
+      return ApiResponse.fromJson(response.data, fromJsonT);
+    } catch (e) {
+      debugPrint('delete error: $e');
+      rethrow;
+    }
   }
 
   /// 用於表單資料上傳（包括檔案上傳）的方法
@@ -120,7 +135,45 @@ class ApiClient {
   /// [onSendProgress] 發送進度回調
   /// [onReceiveProgress] 接收進度回調
   /// [withToken] 是否需要授權令牌
-  Future<Response> postForm(
+  /// [fromJsonT] 回應資料的轉換函數，如果為 null 則返回基本成功回應
+  Future<ApiResponse<T?>> postForm<T>(
+    String path, {
+    required FormData data,
+    Map<String, dynamic>? queryParameters,
+    Map<String, String>? headers,
+    ProgressCallback? onSendProgress,
+    ProgressCallback? onReceiveProgress,
+    bool withToken = true,
+    T? Function(Object?)? fromJsonT,
+  }) async {
+    try {
+      final response = await _client.post(
+        path,
+        data: data,
+        queryParameters: queryParameters,
+        options: Options(headers: createHeaders(headers: headers, withToken: withToken)),
+        onSendProgress: onSendProgress,
+        onReceiveProgress: onReceiveProgress,
+      );
+      
+      if (fromJsonT == null) {
+        return ApiResponse<T?>(
+          code: response.data?['code'] ?? "0",
+          message: response.data?['message'] ?? "上傳成功",
+          data: null,
+        );
+      } else {
+        return ApiResponse.fromJson(response.data, fromJsonT);
+      }
+    } catch (e) {
+      debugPrint('postForm error: $e');
+      rethrow;
+    }
+  }
+
+  /// 保留原始 postForm 方法以向後相容 (已棄用)
+  @Deprecated('使用帶有 fromJsonT 參數的新版本')
+  Future<Response> postFormRaw(
     String path, {
     required FormData data,
     Map<String, dynamic>? queryParameters,
@@ -140,7 +193,7 @@ class ApiClient {
       );
       return response;
     } catch (e) {
-      debugPrint('postForm error: $e');
+      debugPrint('postFormRaw error: $e');
       rethrow;
     }
   }

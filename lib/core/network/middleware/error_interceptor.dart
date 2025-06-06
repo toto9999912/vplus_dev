@@ -1,5 +1,11 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_flavor/flutter_flavor.dart';
+import '../../extensions/context_extensions.dart';
+import '../../router/app_router.dart';
+import '../../router/app_router.gr.dart';
+import '../../service/dialog_service.dart';
 import '../../service/token_service.dart';
 
 /// HTTP 錯誤攔截器
@@ -11,6 +17,7 @@ import '../../service/token_service.dart';
 /// - 網絡連接錯誤處理
 class ErrorInterceptor extends Interceptor {
   final TokenService _tokenService;
+  final DialogService? _dialogService;
 
   // 用於防止重複刷新 token 的標記
   bool _isRefreshing = false;
@@ -18,7 +25,11 @@ class ErrorInterceptor extends Interceptor {
   // 儲存等待 token 刷新完成的請求
   final List<RequestOptions> _pendingRequests = [];
 
-  ErrorInterceptor({required TokenService tokenService}) : _tokenService = tokenService;
+  ErrorInterceptor({
+    required TokenService tokenService,
+    DialogService? dialogService,
+  })  : _tokenService = tokenService,
+        _dialogService = dialogService;
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) async {
@@ -207,16 +218,23 @@ class ErrorInterceptor extends Interceptor {
     // 清除所有 token
     _tokenService.clearTokens();
 
-    // 這裡需要導向登入頁面，你可以根據你的路由系統來實作
-    // 例如使用 AutoRouter
-    // _ref.read(appRouterProvider).replaceAll([const LoginRoute()]);
+    // 導向登入頁面
+    try {
+      rootNavigatorKey.currentContext?.let((context) {
+        // 清除所有路由並導向登入頁面
+        while (rootNavigatorKey.currentState?.canPop() == true) {
+          rootNavigatorKey.currentState?.pop();
+        }
+        // 使用 AutoRouter 導向登入頁面
+        context.router.pushAndClearStack(const LoginRoute());
+      });
+    } catch (e) {
+      debugPrint('❌ 導向登入頁面失敗: $e');
+    }
 
     _showError(
       '登入已過期',
       '您的登入狀態已過期，請重新登入。',
-      onOk: () {
-        // 導向登入頁面的邏輯
-      },
     );
   }
 
@@ -334,7 +352,13 @@ class ErrorInterceptor extends Interceptor {
 
   /// 顯示錯誤對話框
   void _showError(String title, String message, {VoidCallback? onOk}) {
-    try {} catch (e) {
+    try {
+      _dialogService?.showError(
+        title: title,
+        message: message,
+        onOk: onOk,
+      );
+    } catch (e) {
       debugPrint('❌ 顯示錯誤對話框失敗: $e');
       // 如果對話框服務失敗，至少在控制台記錄錯誤
       debugPrint('❌ $title: $message');
@@ -348,8 +372,16 @@ class ErrorInterceptor extends Interceptor {
 
   /// 獲取基礎 URL
   String _getBaseUrl() {
-    // 這裡需要根據你的配置來回傳正確的基礎 URL
-    // 可以從 FlavorConfig 或其他配置來源獲取
-    return 'http://your-api-base-url.com';
+    // 從 FlavorConfig 獲取正確的基礎 URL
+    try {
+      final config = FlavorConfig.instance;
+      // 優先使用 core API，如果沒有則使用 csharp API
+      return config.variables['core'] as String? ??
+             config.variables['csharp'] as String? ??
+             'http://localhost:3000'; // 預設回退 URL
+    } catch (e) {
+      debugPrint('❌ 獲取基礎 URL 失敗: $e');
+      return 'http://localhost:3000';
+    }
   }
 }
