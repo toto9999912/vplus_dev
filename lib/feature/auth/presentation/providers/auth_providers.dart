@@ -23,16 +23,16 @@ RemoteAuthDataSourceImpl authDataSource(Ref ref) {
 @riverpod
 AuthRepositoryImpl authRepository(Ref ref) {
   final dataSource = ref.watch(authDataSourceProvider);
-  final tokenService = ref.watch(tokenServiceProvider);
-  final userService = ref.watch(userServiceProvider);
-  return AuthRepositoryImpl(dataSource, tokenService, userService);
+  return AuthRepositoryImpl(dataSource);
 }
 
 // Login UseCase 提供者
 @riverpod
 LoginUseCase loginUseCase(Ref ref) {
   final repository = ref.watch(authRepositoryProvider);
-  return LoginUseCase(repository);
+  final tokenService = ref.watch(tokenServiceProvider);
+  final userService = ref.watch(userServiceProvider);
+  return LoginUseCase(repository, tokenService, userService);
 }
 
 // Auth State 定義

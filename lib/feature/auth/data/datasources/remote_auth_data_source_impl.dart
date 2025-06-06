@@ -17,4 +17,14 @@ class RemoteAuthDataSourceImpl implements AuthDataSource {
     );
     return response.data;
   }
+
+  @override
+  Future<LoginResponseDto> refreshToken() async {
+    final response = await _apiClient.post(
+      'refresh-token',
+      fromJsonT: (json) => LoginResponseDto.fromJson(json as Map<String, dynamic>),
+      withToken: true,
+    );
+    return response.data;
+  }
 }

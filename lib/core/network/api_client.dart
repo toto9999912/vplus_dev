@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:vplus_dev/core/service/token_service.dart';
 import 'package:vplus_dev/shared/enum/backend_type.dart';
 import 'package:vplus_dev/shared/models/api_response.dart';
+import 'middleware/error_interceptor.dart';
 import 'middleware/logging_interceptor.dart';
 
 class ApiClient {
@@ -21,6 +22,7 @@ class ApiClient {
       ),
     );
     _client.interceptors.add(LoggingInterceptor());
+    _client.interceptors.add(ErrorInterceptor(tokenService: tokenService));
   }
 
   Map<String, dynamic> createHeaders({Map<String, String>? headers, bool withToken = false}) {

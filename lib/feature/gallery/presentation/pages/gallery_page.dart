@@ -1,8 +1,10 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:vplus_dev/core/router/app_router.gr.dart';
+import 'package:vplus_dev/shared/widgets/common/app_error_widget.dart';
 
 import 'package:vplus_dev/shared/enum/access_mode.dart';
 
@@ -51,7 +53,22 @@ class GalleryHeaderPage extends ConsumerWidget {
         );
       },
       error: (error, stackTrace) {
-        return Text(error.toString());
+        if (error is DioException) {
+          // 使用美化的錯誤組件處理網絡錯誤
+          return AppErrorWidget.network(
+            message: '無法載入圖庫，可能的原因是網路不穩或是伺服器忙碌中，請稍後再重新試試吧',
+            onRetry: () {
+              ref.invalidate(galleryTypesProvider);
+            },
+          );
+        }
+        return AppErrorWidget.unknown(
+          message: '載入圖庫時發生未知錯誤',
+          details: error.toString(),
+          onRetry: () {
+            ref.invalidate(galleryTypesProvider);
+          },
+        );
       },
       loading: () => const Center(child: CircularProgressIndicator()),
     );
@@ -99,7 +116,15 @@ class GalleryViewScreen extends ConsumerWidget {
           ),
         );
       },
-      error: (error, stackTrace) => ErrorWidget(error),
+      error:
+          (error, stackTrace) => AppErrorWidget.unknown(
+            message: '載入分類資料時發生錯誤',
+            details: error.toString(),
+            onRetry: () {
+              ref.invalidate(selectedGalleryTypeProvider);
+            },
+            compact: true,
+          ),
       loading: () {
         return const Text("loading");
       },
